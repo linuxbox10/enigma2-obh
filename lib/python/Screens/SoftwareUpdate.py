@@ -363,7 +363,7 @@ class UpdatePlugin(Screen, ProtectedScreen):
 				error = _("Your %s %s might be unusable now. Please consult the manual for further assistance before rebooting your %s %s.") % (getMachineBrand(), getMachineName(), getMachineBrand(), getMachineName())
 				if self.packages == 0:
 					if self.error != 0:
-						error = _("Problem retrieving update list.\nIf this issue persists please check/report on forum")
+						error = _("Problem retrieving update list.\nIf this issue persists please check vuplus-images.co.uk")
 					else:
 						error = _("A background update check is in progress,\nplease wait a few minutes and try again.")
 				if self.updating:
