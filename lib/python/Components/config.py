@@ -29,7 +29,7 @@ from time import localtime, strftime
 #
 class ConfigElement(object):
 	def __init__(self):
-		self.extra_args = {}
+		self.extra_args = []
 		self.saved_value = None
 		self.save_forced = False
 		self.last_value = None
@@ -108,33 +108,25 @@ class ConfigElement(object):
 	def changed(self):
 		if self.__notifiers:
 			for x in self.notifiers:
-				try:
-					if self.extra_args[x]:
-						x(self, self.extra_args[x])
-					else:
-						x(self)
-				except BaseException:
+				extra_args = self.__getExtraArgs(x)
+				if extra_args is not None:
+					x(self, extra_args)
+				else:
 					x(self)
 
 	def changedFinal(self):
 		if self.__notifiers_final:
 			for x in self.notifiers_final:
-				try:
-					if self.extra_args[x]:
-						x(self, self.extra_args[x])
-					else:
-						x(self)
-				except BaseException:
+				extra_args = self.__getExtraArgs(x)
+				if extra_args is not None:
+					x(self, extra_args)
+				else:
 					x(self)
 
 	def addNotifier(self, notifier, initial_call=True, immediate_feedback=True, extra_args=None):
-		if not extra_args:
-			extra_args = []
 		assert callable(notifier), "notifiers must be callable"
-		try:
-			self.extra_args[notifier] = extra_args
-		except BaseException:
-			pass
+		if extra_args is not None:
+			self.__addExtraArgs(notifier, extra_args)
 		if immediate_feedback:
 			self.notifiers.append(notifier)
 		else:
@@ -156,6 +148,7 @@ class ConfigElement(object):
 	def removeNotifier(self, notifier):
 		notifier in self.notifiers and self.notifiers.remove(notifier)
 		notifier in self.notifiers_final and self.notifiers_final.remove(notifier)
+		self.__removeExtraArgs(notifier)
 		try:
 			del self.__notifiers[str(notifier)]
 		except BaseException:
@@ -187,6 +180,19 @@ class ConfigElement(object):
 
 	def showHelp(self, session):
 		pass
+
+	def __addExtraArgs(self, notifier, extra_args):
+		self.extra_args.append((notifier, extra_args))
+
+	def __removeExtraArgs(self, notifier):
+		for i in range(len(self.extra_args)):
+			if self.extra_args[i][0] == notifier:
+				del self.extra_args[i]
+
+	def __getExtraArgs(self, notifier):
+		for extra_arg in self.extra_args:
+			if extra_arg[0] == notifier:
+				return extra_arg[1]
 
 
 KEY_LEFT = 0
@@ -323,7 +329,7 @@ class descriptionList(choicesList):  # XXX: we might want a better name for this
 # all ids MUST be plain strings.
 #
 class ConfigSelection(ConfigElement):
-	def __init__(self, choices, default=None):
+	def __init__(self, choices, default=None, graphic=True):
 		ConfigElement.__init__(self)
 		self.choices = choicesList(choices)
 
@@ -332,6 +338,7 @@ class ConfigSelection(ConfigElement):
 
 		self._descr = None
 		self.default = self._value = self.last_value = default
+		self.graphic = graphic
 
 	def setChoices(self, choices, default=None):
 		self.choices = choicesList(choices)
@@ -390,21 +397,20 @@ class ConfigSelection(ConfigElement):
 		self.value = self.choices[(i + 1) % nchoices]
 
 	def getText(self):
-		if self._descr is not None:
-			return self._descr
-		descr = self._descr = self.description[self.value]
-		if descr:
-			return _(descr)
-		return descr
+		if self._descr is None:
+			self._descr = self.description[self.value]
+		return self._descr
 
 	def getMulti(self, selected):
-		if self._descr is not None:
-			descr = self._descr
-		else:
-			descr = self._descr = self.description[self.value]
-		if descr:
-			return "text", _(descr)
-		return "text", descr
+		if self._descr is None:
+			self._descr = self.description[self.value]
+		from config import config
+		from skin import switchPixmap
+		if self.graphic and config.usage.boolean_graphic.value == "yes" and "menu_on" in switchPixmap and "menu_off" in switchPixmap:
+			pixmap = "menu_on" if self._descr in (_('True'), _('true'), _('Yes'), _('yes'), _('Enable'), _('enable'), _('Enabled'), _('enabled'), _('On'), _('on')) else "menu_off" if self._descr in (_('False'), _('false'), _('No'), _('no'), _("Disable"), _('disable'), _('Disabled'), _('disabled'), _('Off'), _('off'), _('None'), _('none')) else None
+			if pixmap:
+				return ('pixmap', switchPixmap[pixmap])
+		return ("text", self._descr)
 
 	# HTML
 	def getHTML(self, id):
@@ -430,9 +436,8 @@ class ConfigSelection(ConfigElement):
 # several customized versions exist for different
 # descriptions.
 #
-boolean_descriptions = {False: _("false"), True: _("true")}
 class ConfigBoolean(ConfigElement):
-	def __init__(self, default=False, descriptions=boolean_descriptions, graphic=True):
+	def __init__(self, default=False, descriptions={False: _("false"), True: _("true")}, graphic=True):
 		ConfigElement.__init__(self)
 		self.descriptions = descriptions
 		self.value = self.last_value = self.default = default
@@ -447,21 +452,14 @@ class ConfigBoolean(ConfigElement):
 			self.value = True
 
 	def getText(self):
-		descr = self.descriptions[self.value]
-		if descr:
-			return _(descr)
-		return descr
+		return self.descriptions[self.value]
 
 	def getMulti(self, selected):
 		from config import config
 		from skin import switchPixmap
-		if self.graphic and config.usage.boolean_graphic.value and switchPixmap.get("menu_on", False) and switchPixmap.get("menu_off", False):
-			return ('pixmap', self.value and switchPixmap["menu_on"] or switchPixmap["menu_off"])
-		else:
-			descr = self.descriptions[self.value]
-			if descr:
-				return "text", _(descr)
-			return "text", descr
+		if self.graphic and config.usage.boolean_graphic.value in ("yes", "only_bool") and "menu_on" in switchPixmap and "menu_off" in switchPixmap:
+			return ('pixmap', switchPixmap["menu_on" if self.value else "menu_off"])
+		return ("text", self.descriptions[self.value])
 
 	def tostring(self, value):
 		if not value or str(value).lower() == 'false':
@@ -494,23 +492,17 @@ class ConfigBoolean(ConfigElement):
 			self.changedFinal()
 			self.last_value = self.value
 
-
-yes_no_descriptions = {False: _("no"), True: _("yes")}
 class ConfigYesNo(ConfigBoolean):
 	def __init__(self, default=False, graphic=True):
-		ConfigBoolean.__init__(self, default=default, descriptions=yes_no_descriptions, graphic=graphic)
+		ConfigBoolean.__init__(self, default=default, descriptions={False: _("no"), True: _("yes")}, graphic=graphic)
 
-
-on_off_descriptions = {False: _("off"), True: _("on")}
 class ConfigOnOff(ConfigBoolean):
 	def __init__(self, default=False, graphic=True):
-		ConfigBoolean.__init__(self, default=default, descriptions=on_off_descriptions, graphic=graphic)
+		ConfigBoolean.__init__(self, default=default, descriptions={False: _("off"), True: _("on")}, graphic=graphic)
 
-
-enable_disable_descriptions = {False: _("disable"), True: _("enable")}
 class ConfigEnableDisable(ConfigBoolean):
 	def __init__(self, default=False, graphic=True):
-		ConfigBoolean.__init__(self, default=default, descriptions=enable_disable_descriptions, graphic=graphic)
+		ConfigBoolean.__init__(self, default=default, descriptions={False: _("disable"), True: _("enable")}, graphic=graphic)
 
 class ConfigDateTime(ConfigElement):
 	def __init__(self, default, formatstring, increment=86400):

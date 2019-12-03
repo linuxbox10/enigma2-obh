@@ -475,7 +475,7 @@ RESULT eStaticServiceDVBPVRInformation::getEvent(const eServiceReference &ref, e
 {
 	if (!ref.path.empty())
 	{
-		if (ref.path.substr(0, 7) == "http://")
+		if (ref.path.find("://") != std::string::npos)
 		{
 			eServiceReference equivalentref(ref);
 			/* this might be a scrambled stream (id + 0x100), force equivalent dvb type */
@@ -930,7 +930,7 @@ RESULT eServiceFactoryDVB::play(const eServiceReference &ref, ePtr<iPlayableServ
 
 RESULT eServiceFactoryDVB::record(const eServiceReference &ref, ePtr<iRecordableService> &ptr)
 {
-	bool isstream = ref.path.substr(0, 7) == "http://";
+	bool isstream = ref.path.find("://") != std::string::npos;
 	ptr = new eDVBServiceRecord((eServiceReferenceDVB&)ref, isstream);
 	return 0;
 }
@@ -1021,7 +1021,7 @@ eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *serv
 	m_have_video_pid(0),
 	m_tune_state(-1),
 	m_noaudio(false),
-	m_is_stream(ref.path.substr(0, 7) == "http://"),
+	m_is_stream(ref.path.find("://") != std::string::npos),
 	m_is_pvr(!ref.path.empty() && !m_is_stream),
 	m_is_paused(0),
 	m_timeshift_enabled(0),
@@ -1736,7 +1736,7 @@ RESULT eDVBServicePlay::subServices(ePtr<iSubserviceList> &ptr)
 RESULT eDVBServicePlay::timeshift(ePtr<iTimeshiftService> &ptr)
 {
 	ptr = nullptr;
-	eDebug("[eDVBServicePlay] timeshift");
+	/* eDebug("[eDVBServicePlay] timeshift"); */
 	if (m_timeshift_enabled || !m_is_pvr)
 	{
 		if (!m_timeshift_enabled)
@@ -1974,6 +1974,9 @@ int eDVBServicePlay::getInfo(int w)
 			apid = m_dvb_service->getCacheEntry(eDVBService::cAC3PID);
 			if (apid != -1)
 				return apid;
+			apid = m_dvb_service->getCacheEntry(eDVBService::cAC4PID);
+			if (apid != -1)
+				return apid;
 			apid = m_dvb_service->getCacheEntry(eDVBService::cDDPPID);
 			if (apid != -1)
 				return apid;
@@ -1985,7 +1988,7 @@ int eDVBServicePlay::getInfo(int w)
 				return apid;
 			apid = m_dvb_service->getCacheEntry(eDVBService::cDRAAPID);
 			if (apid != -1)
-				return apid;				
+				return apid;
 		}
 		if (no_program_info) return -1;
 		if (program.audioStreams.empty()) return -1;
@@ -2123,20 +2126,22 @@ RESULT eDVBServicePlay::getTrackInfo(struct iAudioTrackInfo &info, unsigned int 
 		info.m_description = "MPEG";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAC3)
 		info.m_description = "AC3";
+	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAC4)
+		info.m_description = "AC4";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDDP)
 		info.m_description = "AC3+";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAAC)
 		info.m_description = "AAC";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAACHE)
 		info.m_description = "AAC-HE";
-	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDRA)
-		info.m_description = "DRA";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDTS)
 		info.m_description = "DTS";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDTSHD)
 		info.m_description = "DTS-HD";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atLPCM)
 		info.m_description = "LPCM";
+	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDRA)
+		info.m_description = "DRA";
 	else
 		info.m_description = "???";
 
@@ -2242,6 +2247,7 @@ int eDVBServicePlay::selectAudioStream(int i)
 	if (m_dvb_service && ((i != -1) || (program.audioStreams.size() == 1)
 		|| ((m_dvb_service->getCacheEntry(eDVBService::cMPEGAPID) == -1)
 		&& (m_dvb_service->getCacheEntry(eDVBService::cAC3PID)== -1)
+		&& (m_dvb_service->getCacheEntry(eDVBService::cAC4PID)== -1)
 		&& (m_dvb_service->getCacheEntry(eDVBService::cDDPPID)== -1)
 		&& (m_dvb_service->getCacheEntry(eDVBService::cAACHEAPID) == -1)
 		&& (m_dvb_service->getCacheEntry(eDVBService::cAACAPID) == -1)
@@ -2249,11 +2255,11 @@ int eDVBServicePlay::selectAudioStream(int i)
 	{
 		m_dvb_service->setCacheEntry(eDVBService::cMPEGAPID, apidtype == eDVBAudio::aMPEG ? apid : -1);
 		m_dvb_service->setCacheEntry(eDVBService::cAC3PID, apidtype == eDVBAudio::aAC3 ? apid : -1);
+		m_dvb_service->setCacheEntry(eDVBService::cAC4PID, apidtype == eDVBAudio::aAC4 ? apid : -1);
 		m_dvb_service->setCacheEntry(eDVBService::cDDPPID, apidtype == eDVBAudio::aDDP ? apid : -1);
 		m_dvb_service->setCacheEntry(eDVBService::cAACHEAPID, apidtype == eDVBAudio::aAACHE ? apid : -1);
 		m_dvb_service->setCacheEntry(eDVBService::cAACAPID, apidtype == eDVBAudio::aAAC ? apid : -1);
 		m_dvb_service->setCacheEntry(eDVBService::cDRAAPID, apidtype == eDVBAudio::aDRA ? apid : -1);
-
 	}
 
 	h.resetCachedProgram();

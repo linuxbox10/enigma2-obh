@@ -278,7 +278,7 @@ class DiseqcTester(Screen, TuneTest, ResultParser):
 	def readTransponderList(self):
 		for sat in nimmanager.getSatListForNim(self.feid):
 			for transponder in nimmanager.getTransponders(sat[0], self.feid):
-				mytransponder = (transponder[1] / 1000, transponder[2] / 1000, transponder[3], transponder[4], transponder[7], sat[0], transponder[5], transponder[6], transponder[8], transponder[9], transponder[10], transponder[11], transponder[12], transponder[13], transponder[14])
+				mytransponder = (transponder[1] / 1000, transponder[2] / 1000, transponder[3], transponder[4], transponder[7], sat[0], transponder[5], transponder[6], transponder[8], transponder[9], transponder[10], transponder[11], transponder[12], transponder[13], transponder[14], transponder[15], transponder[16])
 				self.analyseTransponder(mytransponder)
 
 	def getIndexForTransponder(self, transponder):
@@ -637,23 +637,10 @@ class DiseqcTesterTestTypeSelection(Screen, ConfigListScreen):
 		return SetupSummary
 
 class DiseqcTesterNimSelection(NimSelection):
-	skin = """
-		<screen position="160,123" size="400,330" title="Select a tuner">
-		<widget source="nimlist" render="Listbox" position="0,0" size="380,300" scrollbarMode="showOnDemand">
-			<convert type="TemplatedMultiContent">
-				{"template": [
-						MultiContentEntryText(pos = (10, 5), size = (360, 30), flags = RT_HALIGN_LEFT, text = 1), # index 1 is the nim name,
-						MultiContentEntryText(pos = (50, 30), size = (320, 30), font = 1, flags = RT_HALIGN_LEFT, text = 2), # index 2 is a description of the nim settings,
-					],
-				 "fonts": [gFont("Regular", 20), gFont("Regular", 15)],
-				 "itemHeight": 70
-				}
-			</convert>
-		</widget>
-	</screen>"""
-
 	def __init__(self, session, args = None):
 		NimSelection.__init__(self, session)
+		# for the skin: first try 'DiseqcTesterNimSelection', then 'NimSelection', this allows individual skinning
+		self.skinName = ["DiseqcTesterNimSelection", "NimSelection"]
 
 	def setResultClass(self):
 		#self.resultclass = DiseqcTester

@@ -7,8 +7,9 @@ import Components.ParentalControl
 from Components.SystemInfo import SystemInfo
 from Components.Sources.StaticText import StaticText
 from GlobalActions import globalActionMap
-from enigma import eDVBVolumecontrol, eTimer, eDVBLocalTimeHandler, eServiceReference
-from boxbranding import getMachineBrand, getMachineName, getBoxType
+from enigma import eDVBVolumecontrol, eTimer, eDVBLocalTimeHandler, eServiceReference, eStreamServer
+from Components.Sources.StreamService import StreamServiceList
+from boxbranding import getMachineBrand, getMachineName, getBoxType, getBrandOEM, getMachineBuild
 from Tools import Notifications
 from time import localtime, time
 import Screens.InfoBar
@@ -22,6 +23,8 @@ QUIT_REBOOT = 2
 QUIT_RESTART = 3
 QUIT_UPGRADE_FP = 4
 QUIT_ERROR_RESTART = 5
+QUIT_ANDROID = 12
+QUIT_MAINT = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
 
@@ -35,6 +38,11 @@ def setLCDMiniTVMode(value):
 
 class Standby2(Screen):
 	def Power(self):
+#		if (getBrandOEM() in ('dinobot') or getMachineBuild() in ('viper4k', 'gbmv200', 'sf8008', 'beyonwizv2')):
+#			try:
+#				open("/proc/stb/hdmi/output", "w").write("on")
+#			except:
+#				pass
 		print "[Standby] leave standby"
 		self.close(True)
 
@@ -106,6 +114,11 @@ class Standby2(Screen):
 			self.avswitch.setInput("SCART")
 		else:
 			self.avswitch.setInput("AUX")
+#		if (getBrandOEM() in ('dinobot') or getMachineBuild() in ('viper4k', 'gbmv200', 'sf8008', 'beyonwizv2')):
+#			try:
+#				open("/proc/stb/hdmi/output", "w").write("off")
+#			except:
+#				pass
 		self.onFirstExecBegin.append(self.__onFirstExecBegin)
 		self.onClose.append(self.__onClose)
 
@@ -207,6 +220,8 @@ class QuitMainloopScreen(Screen):
 			QUIT_SHUTDOWN: _("Your %s %s is shutting down") % (getMachineBrand(), getMachineName()),
 			QUIT_REBOOT: _("Your %s %s is rebooting") % (getMachineBrand(), getMachineName()),
 			QUIT_RESTART: _("The user interface of your %s %s is restarting") % (getMachineBrand(), getMachineName()),
+			QUIT_ANDROID: _("Your %s %s is rebooting into Android Mode") % (getMachineBrand(), getMachineName()),
+			QUIT_MAINT: _("Your %s %s is rebooting into Recovery Mode") % (getMachineBrand(), getMachineName()),
 			QUIT_UPGRADE_FP: _("Your frontprocessor will be upgraded\nPlease wait until your %s %s reboots\nThis may take a few minutes") % (getMachineBrand(), getMachineName()),
 			QUIT_ERROR_RESTART: _("The user interface of your %s %s is restarting\ndue to an error in mytest.py") % (getMachineBrand(), getMachineName()),
 			QUIT_UPGRADE_PROGRAM: _("Upgrade in progress\nPlease wait until your %s %s reboots\nThis may take a few minutes") % (getMachineBrand(), getMachineName()),
@@ -244,6 +259,8 @@ class TryQuitMainloop(MessageBox):
 		if recordings or (next_rec_time > 0 and (next_rec_time - time()) < 360):
 			default_yes = False
 			reason = _("Recording(s) are in progress or coming up in few seconds!") + '\n'
+		if eStreamServer.getInstance().getConnectedClients() or StreamServiceList:
+			reason += _("A client is streaming from this box!") + '\n'
 
 		if reason and inStandby:
 			session.nav.record_event.append(self.getRecordEvent)
@@ -253,12 +270,14 @@ class TryQuitMainloop(MessageBox):
 				QUIT_SHUTDOWN: _("Really shutdown now?"),
 				QUIT_REBOOT: _("Really reboot now?"),
 				QUIT_RESTART: _("Really restart now?"),
+				QUIT_ANDROID: _("Really reboot into Android Mode?"),
+				QUIT_MAINT: _("Really reboot into Recovery Mode?"),
 				QUIT_UPGRADE_FP: _("Really upgrade the frontprocessor and reboot now?"),
 				QUIT_UPGRADE_PROGRAM: _("Really upgrade your %s %s and reboot now?") % (getMachineBrand(), getMachineName()),
 				QUIT_IMAGE_RESTORE: _("Really reflash your %s %s and reboot now?") % (getMachineBrand(), getMachineName())
 			}.get(retvalue)
 			if text:
-				MessageBox.__init__(self, session, reason+text, type = MessageBox.TYPE_YESNO, timeout = timeout, default = default_yes)
+				MessageBox.__init__(self, session, "%s\n%s" % (reason, text), type = MessageBox.TYPE_YESNO, timeout = timeout, default = default_yes)
 				self.skinName = "MessageBoxSimple"
 				session.nav.record_event.append(self.getRecordEvent)
 				self.connected = True

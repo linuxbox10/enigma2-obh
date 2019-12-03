@@ -17,12 +17,12 @@ from Tools.Trashcan import getTrashFolder
 import NavigationInstance
 import skin
 
-from enigma import eListboxPythonMultiContent, eListbox, gFont, iServiceInformation, eSize, loadPNG, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_VALIGN_CENTER, BT_SCALE, BT_KEEP_ASPECT_RATIO, eServiceReference, eServiceCenter, eTimer
+from enigma import eListboxPythonMultiContent, eListbox, gFont, iServiceInformation, eSize, loadPNG, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_VALIGN_CENTER, BT_SCALE, BT_KEEP_ASPECT_RATIO, BT_HALIGN_CENTER, BT_VALIGN_CENTER, eServiceReference, eServiceCenter, eTimer
 
 AUDIO_EXTENSIONS = frozenset((".dts", ".mp3", ".wav", ".wave", ".wv", ".oga", ".ogg", ".flac", ".m4a", ".mp2", ".m2a", ".wma", ".ac3", ".mka", ".aac", ".ape", ".alac", ".amr", ".au", ".mid"))
 DVD_EXTENSIONS = frozenset((".iso", ".img", ".nrg"))
 IMAGE_EXTENSIONS = frozenset((".jpg", ".png", ".gif", ".bmp", ".jpeg", ".jpe"))
-MOVIE_EXTENSIONS = frozenset((".mpg", ".vob", ".m4v", ".mkv", ".avi", ".divx", ".dat", ".flv", ".mp4", ".mov", ".wmv", ".asf", ".3gp", ".3g2", ".mpeg", ".mpe", ".rm", ".rmvb", ".ogm", ".ogv", ".m2ts", ".mts", ".webm", ".pva", ".wtv"))
+MOVIE_EXTENSIONS = frozenset((".mpg", ".vob", ".m4v", ".mkv", ".avi", ".divx", ".dat", ".flv", ".mp4", ".mov", ".wmv", ".asf", ".3gp", ".3g2", ".mpeg", ".mpe", ".rm", ".rmvb", ".ogm", ".ogv", ".m2ts", ".mts", ".webm", ".pva", ".wtv", ".ts"))
 KNOWN_EXTENSIONS = MOVIE_EXTENSIONS.union(IMAGE_EXTENSIONS, DVD_EXTENSIONS, AUDIO_EXTENSIONS)
 
 cutsParser = struct.Struct('>QI') # big-endian, 64-bit PTS and 32-bit type
@@ -148,7 +148,7 @@ class MovieList(GUIComponent):
 	HIDE_DESCRIPTION = 1
 	SHOW_DESCRIPTION = 2
 
-# So MovieSelection.selectSortby() can find out whether we are 
+# So MovieSelection.selectSortby() can find out whether we are
 # in a Trash folder and, if so, what the last sort was
 # The numbering starts after SORT_* values above.
 # in MovieSelection.py (that has no SORT_GROUPWISE)
@@ -220,11 +220,9 @@ class MovieList(GUIComponent):
 			index = self.findService(self._playInBackground)
 			if index is not None:
 				self.invalidateItem(index)
-				self.l.invalidateEntry(index)
 			index = self.findService(value)
 			if index is not None:
 				self.invalidateItem(index)
-				self.l.invalidateEntry(index)
 			self._playInBackground = value
 
 	playInBackground = property(get_playInBackground, set_playInBackground)
@@ -339,6 +337,7 @@ class MovieList(GUIComponent):
 	def invalidateItem(self, index):
 		x = self.list[index]
 		self.list[index] = (x[0], x[1], x[2], None)
+		self.l.invalidateEntry(index)
 
 	def invalidateCurrentItem(self):
 		self.invalidateItem(self.getCurrentIndex())
@@ -351,7 +350,7 @@ class MovieList(GUIComponent):
 		durationWidth = self.durationWidth if config.usage.load_length_of_movies_in_moviellist.value else 0
 
 		width = self.l.getItemSize().width()
-		
+
 		dateWidth = self.dateWidth
 		if not config.movielist.use_fuzzy_dates.value:
 			dateWidth += 30
@@ -462,7 +461,7 @@ class MovieList(GUIComponent):
 				res.append(MultiContentEntryPixmapAlphaBlend(
 					pos = (colX, 0), size = (piconWidth, ih),
 					png = displayPicon,
-					backcolor = None, backcolor_sel = None, flags = BT_SCALE | BT_KEEP_ASPECT_RATIO))
+					backcolor = None, backcolor_sel = None, flags = BT_SCALE | BT_KEEP_ASPECT_RATIO | BT_HALIGN_CENTER | BT_VALIGN_CENTER))
 			colX += piconWidth + space
 		else:
 			colX += addProgress() + space
@@ -684,8 +683,9 @@ class MovieList(GUIComponent):
 		self.list.sort(key=self.buildGroupwiseSortkey)
 
 # Have we had a temporary sort method override set in MovieSelectiom.py?
-# If so use it, remove it (it's a one-off) and remember the method so
-# that the "Sort by" menu can highlight it.
+# If so use it, remove it (it's a one-off) and set the current method so
+# that the "Sort by" menu can highlight it and "Sort" knows which to
+# move on from (both in Screens/MovieSelection.py).
 #
 		try:
 			self.current_sort = self.temp_sort

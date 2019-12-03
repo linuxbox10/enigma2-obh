@@ -252,7 +252,7 @@ def parseParameter(s):
 	else:
 		return s
 
-def collectAttributes(skinAttributes, node, context, skin_path_prefix=None, ignore=(), filenames=frozenset(("pixmap", "pointer", "seek_pointer", "backgroundPixmap", "selectionPixmap", "sliderPixmap", "scrollbarbackgroundPixmap"))):
+def collectAttributes(skinAttributes, node, context, skin_path_prefix=None, ignore=(), filenames=frozenset(("pixmap", "pointer", "seek_pointer", "backgroundPixmap", "selectionPixmap", "sliderPixmap", "scrollbarSliderPicture", "scrollbarbackgroundPixmap", "scrollbarBackgroundPicture"))):
 	# walk all attributes
 	size = None
 	pos = None
@@ -346,6 +346,8 @@ class AttributeParser:
 		self.guiObject.setText(_(value))
 	def font(self, value):
 		self.guiObject.setFont(parseFont(value, self.scaleTuple))
+	def secondfont(self, value):
+		self.guiObject.setSecondFont(parseFont(value, self.scaleTuple))
 	def zPosition(self, value):
 		self.guiObject.setZPosition(int(value))
 	def itemHeight(self, value):
@@ -363,6 +365,12 @@ class AttributeParser:
 		ptr = loadPixmap(value, self.desktop)
 		self.guiObject.setSliderPicture(ptr)
 	def scrollbarbackgroundPixmap(self, value):
+		ptr = loadPixmap(value, self.desktop)
+		self.guiObject.setScrollbarBackgroundPicture(ptr)
+	def scrollbarSliderPicture(self, value):	# for compability same as sliderPixmap
+		ptr = loadPixmap(value, self.desktop)
+		self.guiObject.setSliderPicture(ptr)
+	def scrollbarBackgroundPicture(self, value):	# for compability same as scrollbarbackgroundPixmap
 		ptr = loadPixmap(value, self.desktop)
 		self.guiObject.setScrollbarBackgroundPicture(ptr)
 	def alphatest(self, value):
@@ -445,6 +453,14 @@ class AttributeParser:
 		self.guiObject.setBorderColor(parseColor(value))
 	def borderWidth(self, value):
 		self.guiObject.setBorderWidth(int(value))
+	def scrollbarSliderBorderWidth(self, value):
+		self.guiObject.setScrollbarSliderBorderWidth(int(value))
+	def scrollbarWidth(self, value):
+		self.guiObject.setScrollbarWidth(int(value))
+	def scrollbarSliderBorderColor(self, value):
+		self.guiObject.setSliderBorderColor(parseColor(value))
+	def scrollbarSliderForegroundColor(self, value):
+		self.guiObject.setSliderForegroundColor(parseColor(value))
 	def scrollbarMode(self, value):
 		self.guiObject.setScrollbarMode(getattr(self.guiObject, value))
 		#	{ "showOnDemand": self.guiObject.showOnDemand,
@@ -560,7 +576,10 @@ def loadSingleSkinData(desktop, skin, path_prefix):
 					parameters["SelectionListDescr"] = (45,3,1000,32)
 					parameters["SelectionListLock"] = (0,2,36,36)
 					parameters["SelectionListLockOff"] = (0,2,36,36)
-					parameters["VirtualKeyboard"] = (68,68)
+					parameters["VirtualKeyBoard"] = (68,68)
+					parameters["VirtualKeyBoardAlignment"] = (0,0)
+					parameters["VirtualKeyBoardPadding"] = (7,7)
+					parameters["VirtualKeyBoardShiftColors"] = (0x00ffffff,0x00ffffff,0x0000ffff,0x00ff00ff)
 					parameters["SHOUTcastListItem"] = (30,27,35,96,35,33,60,32)
 					parameters["EPGImportFilterListDescr"] = (30,3,500,30)
 					parameters["EPGImportFilterListLockOff"] = (0,0,30,30)

@@ -37,6 +37,9 @@ def InitUsageConfig():
 		refreshServiceList()
 	config.usage.alternative_number_mode.addNotifier(alternativeNumberModeChange)
 
+	config.usage.hide_number_markers = ConfigYesNo(default = True)
+	config.usage.hide_number_markers.addNotifier(refreshServiceList)
+
 	config.usage.servicetype_icon_mode = ConfigSelection(default = "0", choices = [("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename"))])
 	config.usage.servicetype_icon_mode.addNotifier(refreshServiceList)
 	config.usage.crypto_icon_mode = ConfigSelection(default = "0", choices = [("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename"))])
@@ -159,7 +162,6 @@ def InitUsageConfig():
 	config.usage.timeshift_path.addNotifier(timeshiftpathChanged, immediate_feedback = False)
 	config.usage.allowed_timeshift_paths = ConfigLocations(default = [resolveFilename(SCOPE_TIMESHIFT)])
 
-#GML:1
 	config.usage.trashsort_deltime = ConfigSelection(default = "no", choices = [
 		("no", _("no")),
 		("show record time", _("Yes, show record time")),
@@ -167,7 +169,6 @@ def InitUsageConfig():
 	config.usage.movielist_trashcan = ConfigYesNo(default=True)
 	config.usage.movielist_trashcan_network_clean = ConfigYesNo(default=False)
 
-#GML:2
 	config.usage.movielist_trashcan_days = ConfigSelectionNumber(min = 0, max = 31, stepwidth = 1, default = 8, wraparound = True)
 	config.usage.movielist_trashcan_reserve = ConfigNumber(default = 40)
 	config.usage.on_movie_start = ConfigSelection(default = "ask yes", choices = [
@@ -300,32 +301,42 @@ def InitUsageConfig():
 	config.usage.show_event_progress_in_servicelist.addNotifier(refreshServiceList)
 	config.usage.show_channel_numbers_in_servicelist.addNotifier(refreshServiceList)
 
+	if SystemInfo["WakeOnLAN"]:
+		def wakeOnLANChanged(configElement):
+			if "fp" in SystemInfo["WakeOnLAN"]:
+				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "enable" or "disable")
+			else:
+				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "on" or "off")
+		config.usage.wakeOnLAN = ConfigYesNo(default = False)
+		config.usage.wakeOnLAN.addNotifier(wakeOnLANChanged)
+
+
 	#standby
 	if getDisplayType() in ('textlcd7segment'):
 		config.usage.blinking_display_clock_during_recording = ConfigSelection(default = "Rec", choices = [
-						("Rec", _("REC")), 
-						("RecBlink", _("Blinking REC")), 
+						("Rec", _("REC")),
+						("RecBlink", _("Blinking REC")),
 						("Nothing", _("Nothing"))])
 	else:
 		config.usage.blinking_display_clock_during_recording = ConfigYesNo(default = False)
-		
+
 	#in use
 	if getDisplayType() in ('textlcd'):
 		config.usage.blinking_rec_symbol_during_recording = ConfigSelection(default = "Channel", choices = [
-						("Rec", _("REC Symbol")), 
-						("RecBlink", _("Blinking REC Symbol")), 
+						("Rec", _("REC Symbol")),
+						("RecBlink", _("Blinking REC Symbol")),
 						("Channel", _("Channelname"))])
 	if getDisplayType() in ('textlcd7segment'):
 		config.usage.blinking_rec_symbol_during_recording = ConfigSelection(default = "Rec", choices = [
-						("Rec", _("REC")), 
-						("RecBlink", _("Blinking REC")), 
+						("Rec", _("REC")),
+						("RecBlink", _("Blinking REC")),
 						("Time", _("Time"))])
 	else:
 		config.usage.blinking_rec_symbol_during_recording = ConfigYesNo(default = True)
-		
+
 	if getDisplayType() in ('textlcd7segment'):
 		config.usage.show_in_standby = ConfigSelection(default = "time", choices = [
-						("time", _("Time")), 
+						("time", _("Time")),
 						("nothing", _("Nothing"))])
 
 	config.usage.show_message_when_recording_starts = ConfigYesNo(default = True)
@@ -339,7 +350,7 @@ def InitUsageConfig():
 	])
 	config.usage.movielist_unseen = ConfigYesNo(default = True)
 	config.usage.movielist_servicename_mode = ConfigSelection(default = "", choices = [
-		("", _("None")), 
+		("", _("None")),
 		("picon", _("Picon"))
 	])
 	config.usage.movielist_piconwidth = ConfigSelectionNumber(default = 100, stepwidth = 1, min = 50, max = 500, wraparound = True)
@@ -672,7 +683,7 @@ def InitUsageConfig():
 		config.usage.time.enabled_display.value = False
 		config.usage.time.display.value = config.usage.time.display.default
 
-	config.usage.boolean_graphic = ConfigYesNo(default=False)
+	config.usage.boolean_graphic = ConfigSelection(default="no", choices={"no": _("no"), "yes": _("yes"), "only_bool": _("yes, but not in multi selections")})
 
 	if SystemInfo["hasXcoreVFD"]:
 		def set12to8characterVFD(configElement):
@@ -687,6 +698,7 @@ def InitUsageConfig():
 	config.epg.viasat = ConfigYesNo(default = True)
 	config.epg.netmed = ConfigYesNo(default = True)
 	config.epg.virgin = ConfigYesNo(default = True)
+	config.epg.opentv = ConfigYesNo(default = True)
 
 	def EpgSettingsChanged(configElement):
 		mask = 0xffffffff
@@ -702,6 +714,8 @@ def InitUsageConfig():
 			mask &= ~(eEPGCache.NETMED_SCHEDULE | eEPGCache.NETMED_SCHEDULE_OTHER)
 		if not config.epg.virgin.value:
 			mask &= ~(eEPGCache.VIRGIN_NOWNEXT | eEPGCache.VIRGIN_SCHEDULE)
+		if not config.epg.opentv.value:
+			mask &= ~eEPGCache.OPENTV
 		eEPGCache.getInstance().setEpgSources(mask)
 	config.epg.eit.addNotifier(EpgSettingsChanged)
 	config.epg.mhw.addNotifier(EpgSettingsChanged)
@@ -709,6 +723,7 @@ def InitUsageConfig():
 	config.epg.viasat.addNotifier(EpgSettingsChanged)
 	config.epg.netmed.addNotifier(EpgSettingsChanged)
 	config.epg.virgin.addNotifier(EpgSettingsChanged)
+	config.epg.opentv.addNotifier(EpgSettingsChanged)
 
 	config.epg.histminutes = ConfigSelectionNumber(min = 0, max = 120, stepwidth = 15, default = 0, wraparound = True)
 	def EpgHistorySecondsChanged(configElement):
@@ -767,14 +782,7 @@ def InitUsageConfig():
 	config.usage.keymap = ConfigText(default = eEnv.resolve("${datadir}/enigma2/keymap.xml"))
 
 	config.network = ConfigSubsection()
-	if SystemInfo["WakeOnLAN"]:
-		def wakeOnLANChanged(configElement):
-			if getBoxType() in ('et10000', 'gbquadplus', 'gbquad', 'gb800ueplus', 'gb800seplus', 'gbipbox'):
-				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "on" or "off")
-			else:
-				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "enable" or "disable")
-		config.network.wol = ConfigYesNo(default = False)
-		config.network.wol.addNotifier(wakeOnLANChanged)
+
 	config.network.AFP_autostart = ConfigYesNo(default = True)
 	config.network.NFS_autostart = ConfigYesNo(default = True)
 	config.network.OpenVPN_autostart = ConfigYesNo(default = True)
@@ -813,6 +821,8 @@ def InitUsageConfig():
 	config.seek.selfdefined_13 = ConfigSelectionNumber(min = 1, max = 120, stepwidth = 1, default = 15, wraparound = True)
 	config.seek.selfdefined_46 = ConfigSelectionNumber(min = 1, max = 240, stepwidth = 1, default = 60, wraparound = True)
 	config.seek.selfdefined_79 = ConfigSelectionNumber(min = 1, max = 480, stepwidth = 1, default = 300, wraparound = True)
+
+	config.seek.vod_buttons = ConfigYesNo(default = True)
 
 	config.seek.speeds_forward = ConfigSet(default=[2, 4, 8, 16, 32, 64, 128], choices=[2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128])
 	config.seek.speeds_backward = ConfigSet(default=[2, 4, 8, 16, 32, 64, 128], choices=[1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128])
@@ -878,6 +888,7 @@ def InitUsageConfig():
 		("3", _("Everywhere"))])
 	config.misc.erase_flags.addNotifier(updateEraseFlags, immediate_feedback = False)
 
+	config.misc.zapkey_delay = ConfigSelectionNumber(default = 5, stepwidth = 1, min = 0, max = 20, wraparound = True)
 	if SystemInfo["ZapMode"]:
 		def setZapmode(el):
 			file = open(SystemInfo["ZapMode"], "w")
@@ -887,18 +898,6 @@ def InitUsageConfig():
 			("mute", _("Black screen")), ("hold", _("Hold screen")), ("mutetilllock", _("Black screen till locked")), ("holdtilllock", _("Hold till locked"))])
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback = False)
 	config.usage.historymode = ConfigSelection(default = "1", choices = [("0", _("Just zap")), ("1", _("Show menu"))])
-
-	if SystemInfo["HasForceLNBOn"]:
-		def forceLNBPowerChanged(configElement):
-			open(SystemInfo["HasForceLNBOn"], "w").write(configElement.value)
-		config.misc.forceLnbPower = ConfigSelection(default = "off", choices = [ ("on", _("Yes")), ("off", _("No"))] )
-		config.misc.forceLnbPower.addNotifier(forceLNBPowerChanged)
-
-	if SystemInfo["HasForceToneburst"]:
-		def forceToneBurstChanged(configElement):
-			open(SystemInfo["HasForceToneburst"], "w").write(configElement.value)
-		config.misc.forceToneBurst = ConfigSelection(default = "disable", choices = [ ("enable", _("Yes")), ("disable", _("No"))] )
-		config.misc.forceToneBurst.addNotifier(forceToneBurstChanged)
 
 	config.subtitles = ConfigSubsection()
 	config.subtitles.ttx_subtitle_colors = ConfigSelection(default = "1", choices = [
@@ -1090,11 +1089,11 @@ def InitUsageConfig():
 	config.epgselection.graph_primetimehour = ConfigSelectionNumber(default = 20, stepwidth = 1, min = 00, max = 23, wraparound = True)
 	config.epgselection.graph_primetimemins = ConfigSelectionNumber(default = 00, stepwidth = 1, min = 00, max = 59, wraparound = True)
 	config.epgselection.graph_servicetitle_mode = ConfigSelection(default = "servicename", choices = [
-		("servicename", _("Service Name")), 
+		("servicename", _("Service Name")),
 		("picon", _("Picon")),
-		("picon+servicename", _("Picon and Service Name")), 
-		("servicenumber+picon", _("Service Number and Picon")), 
-		("servicenumber+servicename", _("Service Number and Service Name")), 
+		("picon+servicename", _("Picon and Service Name")),
+		("servicenumber+picon", _("Service Number and Picon")),
+		("servicenumber+servicename", _("Service Number and Service Name")),
 		("servicenumber+picon+servicename", _("Service Number, Picon and Service Name"))])
 	config.epgselection.graph_channel1 = ConfigYesNo(default = False)
 	possibleAlignmentChoices = [

@@ -10,6 +10,7 @@ from RecordTimer import RecordTimerEntry, parseEvent, AFTEREVENT
 from Screens.Screen import Screen
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
+from Screens.ParentalControlSetup import ProtectedScreen
 from Screens.InputBox import PinInput
 from ServiceReference import ServiceReference
 from Screens.TimerEntry import TimerEntry, TimerLog
@@ -18,17 +19,19 @@ from Tools.FuzzyDate import FuzzyTime
 from time import time
 from timer import TimerEntry as RealTimerEntry
 
-class TimerEditList(Screen):
+class TimerEditList(Screen, ProtectedScreen):
 	EMPTY = 0
 	ENABLE = 1
 	DISABLE = 2
 	CLEANUP = 3
 	DELETE = 4
+	STOP = 5
 
 	def __init__(self, session, menu_path = ""):
 		Screen.__init__(self, session)
 		screentitle = _("Timer List")
 		self.menu_path = menu_path
+		ProtectedScreen.__init__(self)
 		if config.usage.show_menupath.value == 'large':
 			self.menu_path += screentitle
 			title = self.menu_path
@@ -79,20 +82,9 @@ class TimerEditList(Screen):
 			}, -1)
 		self.session.nav.RecordTimer.on_state_change.append(self.onStateChange)
 		self.onShown.append(self.updateState)
-		if self.isProtected() and config.ParentalControl.servicepin[0].value:
-			self.onFirstExecBegin.append(boundFunction(self.session.openWithCallback, self.pinEntered, PinInput, pinList=[x.value for x in config.ParentalControl.servicepin], triesEntry=config.ParentalControl.retries.servicepin, title=_("Please enter the correct pin code"), windowTitle=_("Enter pin code")))
 
 	def isProtected(self):
-		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.timer_menu.value
-
-	def pinEntered(self, result):
-		if result is None:
-			self.closeProtectedScreen()
-		elif not result:
-			self.session.openWithCallback(self.close(), MessageBox, _("The pin code you entered is wrong."), MessageBox.TYPE_ERROR, timeout=3)
-
-	def closeProtectedScreen(self, result=None):
-		self.close(None)
+		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.timer_menu.value and config.ParentalControl.servicepin[0].value
 
 	def createSummary(self):
 		return TimerEditListSummary
@@ -167,7 +159,11 @@ class TimerEditList(Screen):
 		cur = self["timerlist"].getCurrent()
 		if cur:
 			self["description"].setText(cur.description)
-			if self.key_red_choice != self.DELETE:
+			if cur.state == 2 and self.key_red_choice != self.STOP:
+				self["actions"].actions.update({"red":self.stopTimerQuestion})
+				self["key_red"].setText(_("Stop"))
+				self.key_red_choice = self.STOP
+			elif cur.state != 2 and self.key_red_choice != self.DELETE:
 				self["actions"].actions.update({"red":self.removeTimerQuestion})
 				self["key_red"].setText(_("Delete"))
 				self.key_red_choice = self.DELETE
@@ -283,12 +279,15 @@ class TimerEditList(Screen):
 			self.refill()
 			self.updateState()
 
+	def stopTimerQuestion(self):
+		cur = self["timerlist"].getCurrent()
+		if cur:
+			self.session.openWithCallback(self.removeTimer, MessageBox, _("Do you really want to stop the current recording and delete timer %s?") % cur.name, default = False)
+
 	def removeTimerQuestion(self):
 		cur = self["timerlist"].getCurrent()
-		if not cur:
-			return
-
-		self.session.openWithCallback(self.removeTimer, MessageBox, _("Do you really want to delete %s?") % cur.name, default = False)
+		if cur:
+			self.session.openWithCallback(self.removeTimer, MessageBox, _("Do you really want to delete %s?") % cur.name, default = False)
 
 	def removeTimer(self, result):
 		if not result:

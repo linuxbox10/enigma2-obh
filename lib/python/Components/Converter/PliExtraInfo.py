@@ -10,20 +10,22 @@ from Tools.GetEcmInfo import GetEcmInfo
 from Poll import Poll
 
 caid_data = (
-	("0x1700", "0x17ff", "BetaCrypt",      "B",  True ),
-	( "0x600",  "0x6ff", "Irdeto",         "I",  True ),
-	("0x1800", "0x18ff", "Nagravision",    "N",  True ),
-	( "0x100",  "0x1ff", "Seca Mediaguard","S",  True ),
-	("0x1000", "0x10FF", "Tandberg",       "T",  True ),
-	( "0x500",  "0x5ff", "Viaccess",       "V",  True ),
-	("0x2600", "0x2600", "Biss",           "BI", True ),
-	("0x4aee", "0x4aee", "BulCrypt",       "BU", True ),
-	("0x5581", "0x5581", "BulCrypt",       "BU", False),
-	( "0xb00",  "0xbff", "Conax",          "CO", True ),
-	( "0xd00",  "0xdff", "CryptoWorks",    "CW", True ),
-	("0x4ae0", "0x4ae1", "DRE-Crypt",      "DC", True ),
-	( "0x900",  "0x9ff", "NDS Videoguard", "ND", True ),
-	( "0xe00",  "0xeff", "PowerVu",        "PV", True )
+	("0x1700", "0x17ff", "BetaCrypt",        "B",     True ),
+	( "0x600",  "0x6ff", "Irdeto",           "I",     True ),
+	("0x1800", "0x18ff", "Nagravision",      "N",     True ),
+	( "0x100",  "0x1ff", "Seca Mediaguard",  "S",     True ),
+	("0x1000", "0x10FF", "Tandberg",         "T",     True ),
+	( "0x500",  "0x5ff", "Viaccess",         "V",     True ),
+	("0x2600", "0x2600", "Biss",             "BI",    True ),
+	("0x4aee", "0x4aee", "BulCrypt",         "BU",    True ),
+	("0x5581", "0x5581", "BulCrypt",         "BU",    False),
+	( "0xb00",  "0xbff", "Conax",            "CO",    True ),
+	( "0xd00",  "0xdff", "CryptoWorks",      "CW",    True ),
+	("0x2700", "0x2710", "DRE-Crypt3",       "DC",    False),
+	("0x4ae0", "0x4ae1", "DRE-Crypt",        "DC",    True ),
+	( "0x900",  "0x9ff", "NDS Videoguard",   "ND",    True ),
+	( "0xe00",  "0xeff", "PowerVu",          "PV",    True ),
+	("0x5601", "0x5604", "Verimatrix",       "VM",    True )
 )
 
 # stream type to codec map
@@ -66,34 +68,38 @@ class PliExtraInfo(Poll, Converter, object):
 		self.poll_interval = 1000
 		self.poll_enabled = True
 		self.ca_table = (
-			("CryptoCaidBetatAvailable",    "B",	False),
-			("CryptoCaidIrdetoAvailable"    "I",	False),
-			("CryptoCaidNagraAvailable",    "N",	False),
-			("CryptoCaidSecaAvailable",     "S",	False),
-			("CryptoCaidTandbergAvailable", "T",	False),
-			("CryptoCaidViaAvailable",      "V",	False),
-			("CryptoCaidBissAvailable",	    "BI",	False),
-			("CryptoCaidBulCrypt1Available","BU",	False),
-			("CryptoCaidBulCrypt2Available","BU",	False),
-			("CryptoCaidConaxAvailable",    "CO",	False),
-			("CryptoCaidCryptoWAvailable",  "CW",	False),
-			("CryptoCaidDreAvailable",      "DC",	False),
-			("CryptoCaidNDSAvailable",      "ND",	False),
-			("CryptoCaidPowerVuAvailable",  "PV",	False),
-			("CryptoCaidBetaSelected",      "B",	True ),
-			("CryptoCaidIrdetoSelected",    "I",	True ),
-			("CryptoCaidNagraSelected",     "N",	True ),
-			("CryptoCaidSecaSelected",      "S",	True ),
-			("CryptoCaidTandbergSelected",  "T",	True ),
-			("CryptoCaidViaSelected",       "V",	True ),
-			("CryptoCaidBissSelected",      "BI",	True ),
-			("CryptoCaidBulCrypt1Selected", "BU",	True ),
-			("CryptoCaidBulCrypt2Selected", "BU",	True ),
-			("CryptoCaidConaxSelected",     "CO",	True ),
-			("CryptoCaidCryptoWSelected",   "CW",	True ),
-			("CryptoCaidDreSelected",       "DC",	True ),
-			("CryptoCaidNDSSelected",       "ND",	True ),
-			("CryptoCaidPowerVuSelected",   "PV",	True ),
+			("CryptoCaidBetatAvailable",      "B",    False),
+			("CryptoCaidIrdetoAvailable",     "I",    False),
+			("CryptoCaidNagraAvailable",      "N",    False),
+			("CryptoCaidSecaAvailable",       "S",    False),
+			("CryptoCaidTandbergAvailable",   "T",    False),
+			("CryptoCaidViaAvailable",        "V",    False),
+			("CryptoCaidBissAvailable",       "BI",   False),
+			("CryptoCaidBulCrypt1Available",  "BU",   False),
+			("CryptoCaidBulCrypt2Available",  "BU",   False),
+			("CryptoCaidConaxAvailable",      "CO",   False),
+			("CryptoCaidCryptoWAvailable",    "CW",   False),
+			("CryptoCaidDre3Available",       "DC",   False),
+			("CryptoCaidDreAvailable",        "DC",   False),
+			("CryptoCaidNDSAvailable",        "ND",   False),
+			("CryptoCaidPowerVuAvailable",    "PV",   False),
+			("CryptoCaidVerimatrixAvailable", "VM",   False),
+			("CryptoCaidBetaSelected",        "B",    True ),
+			("CryptoCaidIrdetoSelected",      "I",    True ),
+			("CryptoCaidNagraSelected",       "N",    True ),
+			("CryptoCaidSecaSelected",        "S",    True ),
+			("CryptoCaidTandbergSelected",    "T",    True ),
+			("CryptoCaidViaSelected",         "V",    True ),
+			("CryptoCaidBissSelected",        "BI",   True ),
+			("CryptoCaidBulCrypt1Selected",   "BU",   True ),
+			("CryptoCaidBulCrypt2Selected",   "BU",   True ),
+			("CryptoCaidConaxSelected",       "CO",   True ),
+			("CryptoCaidCryptoWSelected",     "CW",   True ),
+			("CryptoCaidDre3Selected",        "DC",   True ),
+			("CryptoCaidDreSelected",         "DC",   True ),
+			("CryptoCaidNDSSelected",         "ND",   True ),
+			("CryptoCaidPowerVuSelected",     "PV",   True ),
+			("CryptoCaidVerimatrixSelected",  "VM",   True ),
 		)
 		self.ecmdata = GetEcmInfo()
 		self.feraw = self.fedata = self.updateFEdata = None
@@ -134,229 +140,7 @@ class PliExtraInfo(Poll, Converter, object):
 		res += "\c00??????"
 		return res
 
-	def createCryptoBeta(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x1700', 16) <= int(self.current_caid, 16) <= int('0x17ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x1700', 16) <= caid <= int('0x17ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'B'
-		res += "\c00??????"
-		return res
 
-	def createCryptoIrdeto(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x600', 16) <= int(self.current_caid, 16) <= int('0x6ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x600', 16) <= caid <= int('0x6ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'I'
-		res += "\c00??????"
-		return res
-
-	def createCryptoNagra(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x1800', 16) <= int(self.current_caid, 16) <= int('0x18ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x1800', 16) <= caid <= int('0x18ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'N'
-		res += "\c00??????"
-		return res
-
-	def createCryptoSeca(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x100', 16) <= int(self.current_caid, 16) <= int('0x1ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x100', 16) <= caid <= int('0x1ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'S'
-		res += "\c00??????"
-		return res
-
-	def createCryptoTandberg(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x1010', 16) <= int(self.current_caid, 16) <= int('0x1010', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x1010', 16) <= caid <= int('0x1010', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'T'
-		res += "\c00??????"
-		return res
-
-	def createCryptoVia(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x500', 16) <= int(self.current_caid, 16) <= int('0x5ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x500', 16) <= caid <= int('0x5ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'V'
-		res += "\c00??????"
-		return res
-
-	def createCryptoBiss(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x2600', 16) <= int(self.current_caid, 16) <= int('0x26ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x2600', 16) <= caid <= int('0x26ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'BI'
-		res += "\c00??????"
-		return res
-
-	def createCryptoBulCrypt1(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x4aee', 16) <= int(self.current_caid, 16) <= int('0x4aee', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x4aee', 16) <= caid <= int('0x4aee', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'BU'
-		res += "\c00??????"
-		return res
-
-	def createCryptoBulCrypt2(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x5581', 16) <= int(self.current_caid, 16) <= int('0x5581', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x5581', 16) <= caid <= int('0x5581', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'BU'
-		res += "\c00??????"
-		return res
-
-	def createCryptoConax(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0xb00', 16) <= int(self.current_caid, 16) <= int('0xbff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0xb00', 16) <= caid <= int('0xbff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'CO'
-		res += "\c00??????"
-		return res
-
-	def createCryptoCryptoW(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0xd00', 16) <= int(self.current_caid, 16) <= int('0xdff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0xd00', 16) <= caid <= int('0xdff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'CW'
-		res += "\c00??????"
-		return res
-
-	def createCryptoDre(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x4ae0', 16) <= int(self.current_caid, 16) <= int('0x4ae1', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x4ae0', 16) <= caid <= int('0x4ae1', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'DC'
-		res += "\c00??????"
-		return res
-
-	def createCryptoNDS(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0x900', 16) <= int(self.current_caid, 16) <= int('0x9ff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0x900', 16) <= caid <= int('0x9ff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'NDS'
-		res += "\c00??????"
-		return res
-
-	def createCryptoPowerVU(self, info):
-		available_caids = info.getInfoObject(iServiceInformation.sCAIDs)
-		if int('0xe00', 16) <= int(self.current_caid, 16) <= int('0xeff', 16):
-			color="\c004c7d3f"
-		else:
-			color = "\c009?9?9?"
-			try:
-				for caid in available_caids:
-					if int('0xe00', 16) <= caid <= int('0xeff', 16):
-						color="\c00eeee00"
-			except:
-				pass
-		res = color + 'PV'
-		res += "\c00??????"
-		return res
 
 	def createCryptoSpecial(self, info):
 		caid_name = "Free to Air"
@@ -534,13 +318,13 @@ class PliExtraInfo(Poll, Converter, object):
 				orbpos += 1
 			else:
 				orbpos -= 1
-				
+
 		sat_names = {
 			30:   'Rascom/Eutelsat 3E',
 			48:   'SES 5',
 			70:   'Eutelsat 7E',
 			90:   'Eutelsat 9E',
-			100:  'Eutelsat 10E',  
+			100:  'Eutelsat 10E',
 			130:  'Hot Bird',
 			160:  'Eutelsat 16E',
 			192:  'Astra 1KR/1L/1M/1N',
@@ -626,7 +410,7 @@ class PliExtraInfo(Poll, Converter, object):
 			3560: 'Amos',
 			3592: 'Thor/Intelsat'
 		}
-		
+
 		if orbpos in sat_names:
 			return sat_names[orbpos]
 		elif orbpos > 1800:
@@ -643,6 +427,8 @@ class PliExtraInfo(Poll, Converter, object):
 			tmp = "MIS %d" % fedata.get("is_id")
 		if fedata.get("pls_code") > 0:
 			tmp = addspace(tmp) + "%s %d" % (fedata.get("pls_mode"), fedata.get("pls_code"))
+		if fedata.get("t2mi_plp_id") > -1:
+			tmp = addspace(tmp) + "T2MI %d PID %d" % (fedata.get("t2mi_plp_id"), fedata.get("t2mi_pid"))
 		return tmp
 
 	@cached
@@ -669,108 +455,10 @@ class PliExtraInfo(Poll, Converter, object):
 			else:
 				return ""
 
-		if self.type == "CryptoBeta":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoBeta(info)
-			else:
-				return ""
-
-		if self.type == "CryptoIrdeto":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoIrdeto(info)
-			else:
-				return ""
-
-		if self.type == "CryptoNagra":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoNagra(info)
-			else:
-				return ""
-
-		if self.type == "Seca":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoSeca(info)
-			else:
-				return ""
-
-		if self.type == "CryptoTandberg":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoTandberg(info)
-			else:
-				return ""
-
-		if self.type == "CryptoVia":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoVia(info)
-			else:
-				return ""
-
-		if self.type == "CryptoBiss":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoBiss(info)
-			else:
-				return ""
-
-		if self.type == "CryptoBulCrypt":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoBulCrypt(info)
-			else:
-				return ""
-
-		if self.type == "CryptoConax":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoConax(info)
-			else:
-				return ""
-
-		if self.type == "CryptoCryptoW":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoCryptoW(info)
-			else:
-				return ""
-
-		if self.type == "CryptoDre":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoDre(info)
-			else:
-				return ""
-
-		if self.type == "CryptoNDS":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoNDS(info)
-			else:
-				return ""
-
-		if self.type == "CryptoPowerVu":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoPowerVu(info)
-			else:
-				return ""
-
 		if self.type == "CryptoSpecial":
 			if int(config.usage.show_cryptoinfo.value) > 0:
 				self.getCryptoInfo(info)
 				return self.createCryptoSpecial(info)
-			else:
-				return ""
-
-		if self.type == "CryptoNameCaid":
-			if int(config.usage.show_cryptoinfo.value) > 0:
-				self.getCryptoInfo(info)
-				return self.createCryptoNameCaid(info)
 			else:
 				return ""
 
