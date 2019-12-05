@@ -12,7 +12,7 @@ from Components.Sources.List import List
 from Components.Network import iNetwork
 from Tools.LoadPixmap import LoadPixmap
 from Tools.Directories import fileExists, pathExists, resolveFilename, SCOPE_CURRENT_SKIN
-from os import system, remove as os_remove, rename as os_rename, popen, getcwd, chdir
+from os import system, remove as os_remove, rename as os_rename, popen, getcwd, chdir 
 from Screens.Setup import Setup
 from Plugins.SystemPlugins.NetworkBrowser.NetworkBrowser import NetworkBrowser
 from enigma import eTimer
@@ -21,7 +21,7 @@ import process
 
 class DeliteSettings(Screen):
 	skin = """
-	<screen position="160,110" size="390,360" title="Black Hole Extra Settings">
+	<screen position="160,110" size="390,360" title="Open Donki Extra Settings">
 		<widget source="list" render="Listbox" position="10,10" size="370,330" scrollbarMode="showOnDemand" >
 			<convert type="TemplatedMultiContent">
                 		{"template": [
@@ -296,7 +296,7 @@ class BhNetBrowser(Screen):
 
 class BhMinidlna(Screen):
 	skin = """
-	<screen position="center,center" size="602,405" title="Black Hole UPnP Minidlna Server Panel">
+	<screen position="center,center" size="602,405" title="Open Donki UPnP Minidlna Server Panel">
 		<widget name="lab1" position="20,20" size="580,260" font="Regular;20" valign="center" transparent="1"/>
 		<widget name="lab2" position="20,300" size="300,30" font="Regular;20" valign="center" transparent="1"/>
 		<widget name="labstop" position="320,300" size="150,30" font="Regular;20" valign="center" halign="center" backgroundColor="red"/>
@@ -377,7 +377,7 @@ class BhMinidlna(Screen):
 			
 class DeliteInadyn(Screen):
 	skin = """
-	<screen position="120,70" size="480,410" title="Black Hole E2 Inadyn Manager">
+	<screen position="120,70" size="480,410" title="Open Donki E2 Inadyn Manager">
 		<widget name="linactive" position="10,10" zPosition="1" pixmap="skin_default/icons/ninactive.png" size="32,32"  alphatest="on" />
 		<widget name="lactive" position="10,10" zPosition="2" pixmap="skin_default/icons/nactive.png" size="32,32"  alphatest="on" />
 		<widget name="lab1" position="50,10" size="350,30" font="Regular;20" valign="center"  transparent="1"/>
@@ -528,7 +528,7 @@ class DeliteInadyn(Screen):
 
 class DeliteInaSetup(Screen, ConfigListScreen):
 	skin = """
-	<screen position="140,120" size="440,300" title="Black Hole E2 Inadyn Setup">
+	<screen position="140,120" size="440,300" title="Open Donki E2 Inadyn Setup">
 		<widget name="config" position="10,10" size="420,240" scrollbarMode="showOnDemand" />
 		<ePixmap pixmap="skin_default/buttons/yellow.png" position="150,250" size="140,40" alphatest="on" />
 		<widget name="key_yellow" position="150,250" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
@@ -725,7 +725,7 @@ class DeliteInaSetup(Screen, ConfigListScreen):
 		
 class DeliteInaLog(Screen):
 	skin = """
-	<screen position="140,120" size="440,300" title="Black Hole E2 Inadyn Log">
+	<screen position="140,120" size="440,300" title="Open Donki E2 Inadyn Log">
 		<widget name="infotext" position="10,10" size="420,280" font="Regular;18" />
 	</screen>"""
 	
@@ -755,7 +755,7 @@ class DeliteInaLog(Screen):
 
 class DeliteOpenvpn(Screen):
 	skin = """
-	<screen position="80,150" size="560,310" title="Black Hole E2 OpenVpn Panel">
+	<screen position="80,150" size="560,310" title="Open Donki E2 OpenVpn Panel">
 		<widget name="lab1" position="20,20" size="150,30" font="Regular;20" valign="center" transparent="1"/>
 		<widget name="lab1a" position="170,16" size="370,60" font="Regular;20" valign="center" transparent="1"/>
 		<widget name="lab2" position="20,90" size="150,30" font="Regular;20" valign="center" transparent="1"/>
@@ -876,7 +876,7 @@ class DeliteOpenvpn(Screen):
 	
 class DeliteVpnLog(Screen):
 	skin = """
-	<screen position="80,100" size="560,400" title="Black Hole OpenVpn Log">
+	<screen position="80,100" size="560,400" title="Open Donki OpenVpn Log">
 		<widget name="infotext" position="10,10" size="540,380" font="Regular;18" />
 	</screen>"""
 	
@@ -934,7 +934,7 @@ class BhBackupSettings(Screen):
 
 class BhSpeedUp(Screen, ConfigListScreen):
 	skin = """
-	<screen position="center,center" size="902,570" title="Black Hole Speed Up">
+	<screen position="center,center" size="902,570" title="Open Donki Speed Up">
 		<widget name="lab1" position="10,10" size="882,60" font="Regular;20" valign="top" transparent="1"/>
 		<widget name="config" position="30,70" size="840,450" scrollbarMode="showOnDemand"/>
 		<ePixmap pixmap="skin_default/buttons/red.png" position="200,530" size="140,40" alphatest="on"/>

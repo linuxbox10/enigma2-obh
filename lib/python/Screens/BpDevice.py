@@ -2,7 +2,7 @@ from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Standby import TryQuitMainloop
-from Screens.Console import Console
+from Screens.Console import Console 
 from Components.ActionMap import ActionMap
 from Components.Sources.List import List
 from Components.Label import Label
@@ -216,7 +216,7 @@ class DeliteSetupDevicePanelConf(Screen, ConfigListScreen):
 	
 class BlackPoleSwap(Screen):
 	skin = """
-	<screen position="center,center" size="420,240" title="Black Hole Swap File Manager">
+	<screen position="center,center" size="420,240" title="Open Donki Swap File Manager">
 		<widget name="lab1" position="10,20" size="400,150" font="Regular;20" transparent="1"/>
 		<ePixmap pixmap="skin_default/buttons/red.png" position="0,190" size="140,40" alphatest="on" />
 		<ePixmap pixmap="skin_default/buttons/green.png" position="140,190" size="140,40" alphatest="on" />

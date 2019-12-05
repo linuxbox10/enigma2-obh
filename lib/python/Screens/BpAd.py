@@ -23,7 +23,7 @@ config.bhaddons.lock = ConfigYesNo(default=False)
 config.bhaddons.pin = ConfigInteger(limits=(0, 9999), default=0)
 
 class DeliteAddons(Screen):
-    skin = '\n\t<screen position="160,115" size="390,330" title="Black Hole E2 Addons Manager">\n\t\t<widget source="list" render="Listbox" position="10,16" size="370,300" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="TemplatedMultiContent">\n                \t{"template": [\n                    \tMultiContentEntryText(pos = (50, 1), size = (320, 36), flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0),\n                 \tMultiContentEntryPixmapAlphaTest(pos = (4, 2), size = (36, 36), png = 1),\n                    \t],\n                    \t"fonts": [gFont("Regular", 22)],\n                    \t"itemHeight": 36\n                \t}\n            \t\t</convert>\n\t\t</widget>\n\t</screen>'
+    skin = '\n\t<screen position="160,115" size="390,330" title="Open Donki E2 Addons Manager">\n\t\t<widget source="list" render="Listbox" position="10,16" size="370,300" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="TemplatedMultiContent">\n                \t{"template": [\n                    \tMultiContentEntryText(pos = (50, 1), size = (320, 36), flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0),\n                 \tMultiContentEntryPixmapAlphaTest(pos = (4, 2), size = (36, 36), png = 1),\n                    \t],\n                    \t"fonts": [gFont("Regular", 22)],\n                    \t"itemHeight": 36\n                \t}\n            \t\t</convert>\n\t\t</widget>\n\t</screen>'
 
     def __init__(self, session):
         Screen.__init__(self, session)
@@ -166,7 +166,7 @@ class DeliteAddons(Screen):
 
 
 class Nab_downArea(Screen):
-    skin = '\n\t<screen position="160,115" size="390,330" title="Black Hole E2 Downloads Manager">\n\t\t<widget source="list" render="Listbox" position="10,15" size="370,280" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="TemplatedMultiContent">\n                \t{"template": [\n                   \tMultiContentEntryText(pos = (50, 1), size = (320, 36), flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0),\n                 \tMultiContentEntryPixmapAlphaTest(pos = (4, 2), size = (36, 36), png = 1),\n                    \t],\n                    \t"fonts": [gFont("Regular", 24)],\n                    \t"itemHeight": 36\n                \t}\n            \t\t</convert>\n\t\t</widget>\n\t</screen>'
+    skin = '\n\t<screen position="160,115" size="390,330" title="Open Donki E2 Downloads Manager">\n\t\t<widget source="list" render="Listbox" position="10,15" size="370,280" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="TemplatedMultiContent">\n                \t{"template": [\n                   \tMultiContentEntryText(pos = (50, 1), size = (320, 36), flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0),\n                 \tMultiContentEntryPixmapAlphaTest(pos = (4, 2), size = (36, 36), png = 1),\n                    \t],\n                    \t"fonts": [gFont("Regular", 24)],\n                    \t"itemHeight": 36\n                \t}\n            \t\t</convert>\n\t\t</widget>\n\t</screen>'
 
     def __init__(self, session):
         Screen.__init__(self, session)
@@ -283,7 +283,7 @@ class Nab_downArea(Screen):
 
 
 class Nab_downCat(Screen):
-    skin = '\n\t<screen position="80,95" size="560,405" title="Black Hole E2 Downloads Manager">\n\t\t<widget source="list" render="Listbox" position="10,16" size="540,345" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t</screen>'
+    skin = '\n\t<screen position="80,95" size="560,405" title="Open Donki E2 Downloads Manager">\n\t\t<widget source="list" render="Listbox" position="10,16" size="540,345" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t</screen>'
 
     def __init__(self, session, title):
         Screen.__init__(self, session)
@@ -333,7 +333,7 @@ class Nab_downCat(Screen):
 
 
 class Nab_ShowPreviewFile(Screen):
-    skin = '\n\t<screen position="0,0" size="1280,720" title="Black Hole E2 Preview" flags="wfNoBorder">\n\t\t<widget name="lab1" position="0,0" size="1280,720" zPosition="1" />\n\t\t<widget name="lab2" position="0,30" size="1280,30" zPosition="2" font="Regular;26" halign="center" valign="center" backgroundColor="red" foregroundColor="white" />\n\t</screen>'
+    skin = '\n\t<screen position="0,0" size="1280,720" title="Open Donki E2 Preview" flags="wfNoBorder">\n\t\t<widget name="lab1" position="0,0" size="1280,720" zPosition="1" />\n\t\t<widget name="lab2" position="0,30" size="1280,30" zPosition="2" font="Regular;26" halign="center" valign="center" backgroundColor="red" foregroundColor="white" />\n\t</screen>'
 
     def __init__(self, session, myprev):
         Screen.__init__(self, session)
@@ -352,7 +352,7 @@ class Nab_ShowPreviewFile(Screen):
 
 
 class Nab_ShowDownFile(Screen):
-    skin = '\n\t<screen position="80,95" size="560,405" title="Black Hole E2 Package Details">\n\t\t<widget name="infotext" position="10,15" size="540,315" font="Regular;20" />\n\t\t<ePixmap pixmap="skin_default/buttons/green.png" position="210,365" size="140,40" alphatest="on" />\n\t\t<widget name="key_green" position="210,365" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t\t<ePixmap pixmap="skin_default/buttons/yellow.png" position="400,365" size="140,40" alphatest="on" />\n\t\t<widget name="key_yellow" position="400,365" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t</screen>'
+    skin = '\n\t<screen position="80,95" size="560,405" title="Open Donki E2 Package Details">\n\t\t<widget name="infotext" position="10,15" size="540,315" font="Regular;20" />\n\t\t<ePixmap pixmap="skin_default/buttons/green.png" position="210,365" size="140,40" alphatest="on" />\n\t\t<widget name="key_green" position="210,365" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t\t<ePixmap pixmap="skin_default/buttons/yellow.png" position="400,365" size="140,40" alphatest="on" />\n\t\t<widget name="key_yellow" position="400,365" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />\n\t</screen>'
 
     def __init__(self, session, myidf):
         Screen.__init__(self, session)
@@ -500,7 +500,7 @@ class Nab_ShowDownFile(Screen):
 
 
 class Nab_downPanel(Screen):
-    skin = '\n\t<screen position="80,95" size="560,405" title="Black Hole E2 Manual Install BH Packages">\n\t\t<widget source="list" render="Listbox" position="10,16" size="540,380" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t</screen>'
+    skin = '\n\t<screen position="80,95" size="560,405" title="Open Donki E2 Manual Install BH Packages">\n\t\t<widget source="list" render="Listbox" position="10,16" size="540,380" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t</screen>'
 
     def __init__(self, session):
         Screen.__init__(self, session)
@@ -552,7 +552,7 @@ class Nab_downPanel(Screen):
 
 
 class Nab_downPanelIPK(Screen):
-    skin = '\n\t<screen position="80,95" size="560,405" title="Black Hole E2 Manual Install Ipk Packages">\n\t\t<widget source="list" render="Listbox" position="10,10" size="540,290" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t\t<widget name="warntext" position="0,305" size="560,100" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" />\n\t</screen>'
+    skin = '\n\t<screen position="80,95" size="560,405" title="Open Donki E2 Manual Install Ipk Packages">\n\t\t<widget source="list" render="Listbox" position="10,10" size="540,290" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t\t<widget name="warntext" position="0,305" size="560,100" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" />\n\t</screen>'
 
     def __init__(self, session):
         Screen.__init__(self, session)
@@ -623,7 +623,7 @@ class Nab_downPanelIPK(Screen):
 
 
 class Nab_uninstPanel(Screen):
-    skin = '\n\t<screen position="80,95" size="560,405" title="Black Hole E2 Uninstall Panel">\n\t\t<widget source="list" render="Listbox" position="10,16" size="540,380" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t</screen>'
+    skin = '\n\t<screen position="80,95" size="560,405" title="Open Donki E2 Uninstall Panel">\n\t\t<widget source="list" render="Listbox" position="10,16" size="540,380" scrollbarMode="showOnDemand" >\n\t\t\t<convert type="StringList" />\n\t\t</widget>\n\t</screen>'
 
     def __init__(self, session):
         Screen.__init__(self, session)
@@ -661,7 +661,7 @@ class Nab_uninstPanel(Screen):
 
 
 class Nab_Stats(Screen):
-    skin = '\n\t<screen position="80,95" size="560,405" title="Black Hole E2 Statistics">\n\t\t<widget name="infotext" position="10,15" size="540,315" font="Regular;20" />\n\t</screen>'
+    skin = '\n\t<screen position="80,95" size="560,405" title="Open Donki E2 Statistics">\n\t\t<widget name="infotext" position="10,15" size="540,315" font="Regular;20" />\n\t</screen>'
 
     def __init__(self, session):
         Screen.__init__(self, session)
@@ -741,7 +741,7 @@ class addonsParentalConfig(Screen, ConfigListScreen):
 
 
 class Nab_ConnectPop(Screen):
-    skin = '\n\t<screen position="390,100" size="484,220" title="Black Hole E2" flags="wfNoBorder">\n\t\t<widget name="connect" position="0,0" size="484,250" zPosition="-1" pixmaps="skin_default/connection_1.png,skin_default/connection_2.png,skin_default/connection_3.png,skin_default/connection_4.png,skin_default/connection_5.png" transparent="1" />\n\t\t<widget name="lab1" position="10,180" halign="center" size="460,60" zPosition="1" font="Regular;20" valign="top" transparent="1" />\n\t</screen>'
+    skin = '\n\t<screen position="390,100" size="484,220" title="Open Donki E2" flags="wfNoBorder">\n\t\t<widget name="connect" position="0,0" size="484,250" zPosition="-1" pixmaps="skin_default/connection_1.png,skin_default/connection_2.png,skin_default/connection_3.png,skin_default/connection_4.png,skin_default/connection_5.png" transparent="1" />\n\t\t<widget name="lab1" position="10,180" halign="center" size="460,60" zPosition="1" font="Regular;20" valign="top" transparent="1" />\n\t</screen>'
 
     def __init__(self, session, myurl, downfile):
         Screen.__init__(self, session)
