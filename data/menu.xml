@@ -243,7 +243,7 @@ self.session.open(VIXBackupManager)
 		</menu>
 
 	<!-- Menu / BH Apps -->
-		<item weight="4" text="Black Hole Apps" entryID="blackhole_extra"><screen module="BpSet" screen="DeliteSettings"/></item>
+		<item weight="4" text="Open Donki Apps" entryID="blackhole_extra"><screen module="BpSet" screen="DeliteSettings"/></item>
 
 	<!-- Menu / Plugins -->
 		<item weight="5" text="Plugins" entryID="plugin_selection"><screen module="PluginBrowser" screen="PluginBrowser"/></item>
