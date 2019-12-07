@@ -3,7 +3,7 @@ from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.InputBox import InputBox
 from Screens.Standby import TryQuitMainloop
-from Screens.Console import Console
+from Screens.Console import Console 
 from enigma import eTimer, loadPic, eDVBDB
 from Components.ActionMap import ActionMap
 from Components.ConfigList import ConfigListScreen
@@ -17,7 +17,7 @@ from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN, SCOPE_SKIN_IM
 from os import system, listdir, chdir, getcwd, remove as os_remove
 from urllib2 import Request, urlopen, URLError, HTTPError
 from operator import itemgetter
-from re import compile as re_compile, sub as re_sub
+from re import compile as re_compile, sub as re_sub 
 config.bhaddons = ConfigSubsection()
 config.bhaddons.lock = ConfigYesNo(default=False)
 config.bhaddons.pin = ConfigInteger(limits=(0, 9999), default=0)
@@ -72,7 +72,7 @@ class DeliteAddons(Screen):
         self.list.append(res)
         mypixmap = mypath + 'icons/statpanel.png'
         png = LoadPixmap(mypixmap)
-        name = _('Black Hole Statistics')
+        name = _('OD Statistics')
         idx = 5
         res = (name, png, idx)
         self.list.append(res)
@@ -136,7 +136,7 @@ class DeliteAddons(Screen):
     def runUpgrade(self, result):
         if result:
             from Screens.SoftwareUpdate import UpdatePlugin
-            self.session.open(UpdatePlugin, 'Open Black Hole ')
+            self.session.open(UpdatePlugin, 'Open Donki ')
 
     def checkPanel(self):
         check = 0
@@ -185,7 +185,7 @@ class Nab_downArea(Screen):
             mypath = '/usr/share/enigma2/skin_default/'
         mypixmap = mypath + 'icons/nabplugins.png'
         png = LoadPixmap(mypixmap)
-        name = _('Open Black Hole Addons Plugins')
+        name = _('Open Donki Addons Plugins')
         idx = 1
         res = (name, png, idx)
         self.list.append(res)
@@ -197,25 +197,25 @@ class Nab_downArea(Screen):
         self.list.append(res)
         mypixmap = mypath + 'icons/nabskins.png'
         png = LoadPixmap(mypixmap)
-        name = _('Open Black Hole Image Skins')
+        name = _('Open Donki Image Skins')
         idx = 3
         res = (name, png, idx)
         self.list.append(res)
         mypixmap = mypath + 'icons/nabscript.png'
         png = LoadPixmap(mypixmap)
-        name = _('Black Hole Image Script')
+        name = _('OD Image Script')
         idx = 4
         res = (name, png, idx)
         self.list.append(res)
         mypixmap = mypath + 'icons/nablangs.png'
         png = LoadPixmap(mypixmap)
-        name = _('Black Hole Image Boot Logo')
+        name = _('OD Image Boot Logo')
         idx = 5
         res = (name, png, idx)
         self.list.append(res)
         mypixmap = mypath + 'icons/nabsettings.png'
         png = LoadPixmap(mypixmap)
-        name = _('Black Hole Settings')
+        name = _('OD Settings')
         idx = 6
         res = (name, png, idx)
         self.list.append(res)
@@ -243,25 +243,25 @@ class Nab_downArea(Screen):
         self.title = 'Buuuuu'
         if self.sel == 1:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=outcat&cat=' + pluginver
-            self.title = 'Open Black Hole Addons Plugins'
+            self.title = 'Open Donki Addons Plugins'
         elif self.sel == 2:
             self.url = 'feeds'
-            self.title = 'Open Black Hole Feeds Plugins'
+            self.title = 'Open Donki Feeds Plugins'
         elif self.sel == 3:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=outcat&cat=OpenBlackHole-Skins'
-            self.title = 'Open Black Hole Skins'
+            self.title = 'Open Donki Skins'
         elif self.sel == 4:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=outcat&cat=Scripts'
-            self.title = 'Black Hole Scripts'
+            self.title = 'OD Scripts'
         elif self.sel == 5:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=outcat&cat=Logos'
-            self.title = 'Black Hole Boot Logo'
+            self.title = 'OD Boot Logo'
         elif self.sel == 6:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=outcat&cat=Settings'
-            self.title = 'Black Hole Settings'
+            self.title = 'OD Settings'
         elif self.sel == 7:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=outcat&cat=Picons'
-            self.title = 'Black Hole Picons Packages'
+            self.title = 'OD Picons Packages'
         elif self.sel == 8:
             self.url = 'http://www.vuplus-community.net/bhaddons/index.php?op=' + catver
             self.title = 'Latest 10 Uploads'
@@ -338,7 +338,7 @@ class Nab_ShowPreviewFile(Screen):
     def __init__(self, session, myprev):
         Screen.__init__(self, session)
         self['lab1'] = Pixmap()
-        self['lab2'] = Label(_('Black Hole Preview: click ok to exit'))
+        self['lab2'] = Label(_('OD Preview: click ok to exit'))
         self['actions'] = ActionMap(['WizardActions'], {'ok': self.close,
          'back': self.close})
         self.fileP = myprev.replace('.tgz', '.jpg')
@@ -672,7 +672,7 @@ class Nab_Stats(Screen):
 
     def statshow(self):
         if fileExists('/tmp/cpanel.tmp'):
-            strview = _('Black Hole Image Statistics:\n\n_____________________________________\n')
+            strview = _('OD Image Statistics:\n\n_____________________________________\n')
             step = 0
             f = open('/tmp/cpanel.tmp', 'r')
             for line in f.readlines():

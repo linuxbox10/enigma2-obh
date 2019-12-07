@@ -18,7 +18,7 @@ config.misc.fast_plugin_button = ConfigText(default="")
 class DeliteGreenPanel(Screen):
 	skin = """
 	<screen name="DeliteGreenPanel" position="center,center" size="1000,720" title="Open Donki Green Panel" flags="wfNoBorder">
-		<eLabel text="Black Hole Green Panel" position="80,30" size="800,38" font="Regular;34" halign="left" foregroundColor="#004c74" backgroundColor="transpBlack" transparent="1"/>
+		<eLabel text="Open Donki Green Panel" position="80,30" size="800,38" font="Regular;34" halign="left" foregroundColor="#004c74" backgroundColor="transpBlack" transparent="1"/>
 		<widget source="list" render="Listbox" position="80,105" zPosition="1" size="840,500" scrollbarMode="showOnDemand"  transparent="1">
 			<convert type="TemplatedMultiContent">
 				{"template": [

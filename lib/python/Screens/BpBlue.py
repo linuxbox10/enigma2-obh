@@ -18,7 +18,7 @@ class DeliteBluePanel(Screen):
 	skin = """
 	<screen name="DeliteBluePanel" position="center,center" size="1000,720"  title="Open Donki Blue Panel" flags="wfNoBorder">
         <ePixmap position="339,170" zPosition="3" size="60,40" pixmap="skin_default/buttons/key_ok.png" alphatest="blend" transparent="1" />
-        <eLabel text="Black Hole Blue Panel" position="80,30" size="800,38" font="Regular;34" halign="left" transparent="1"/> 
+        <eLabel text="Open Donki Blue Panel" position="80,30" size="800,38" font="Regular;34" halign="left" transparent="1"/> 
         <widget name="lab1" position="129,90" size="230,25" font="Regular;24" zPosition="2"  transparent="1"/>
         <widget name="list" position="75,126" size="340,38" zPosition="2"  transparent="1"/> 
         <widget name="lab2" position="139,172" size="190,24" font="Regular;20" halign="center" valign="center" zPosition="2" transparent="1"/>
