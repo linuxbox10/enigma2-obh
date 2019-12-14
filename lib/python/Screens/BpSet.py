@@ -121,7 +121,7 @@ class DeliteSettings(Screen):
 		
 		mypixmap = mypath + "icons/infopanel_osd.png"
 		png = LoadPixmap(mypixmap)
-		name = _("Black Hole Speed Up")
+		name = _("Open Donki Speed Up")
 		idx = 0
 		res = (name, png, idx)
 		self.list.append(res)
@@ -1060,7 +1060,7 @@ class BhSpeedUp(Screen, ConfigListScreen):
 									
 											
 		if len(self.mycmdlist) > 0:
-			self.session.open(Console, title=_("Black Hole Speed Up"), cmdlist=self.mycmdlist, finishedCallback = self.allDone)
+			self.session.open(Console, title=_("Open Donki Speed Up"), cmdlist=self.mycmdlist, finishedCallback = self.allDone)
 		else:
 			self.close()
 		
