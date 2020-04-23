@@ -1,4 +1,4 @@
-from boxbranding import getBoxType, getBrandOEM, getDisplayType, getHaveAVJACK, getHaveHDMIinFHD, getHaveHDMIinHD, getHaveRCA, getHaveSCART, getHaveYUV, getMachineBuild
+from boxbranding import getBoxType, getBrandOEM, getDisplayType, getHaveAVJACK, getHaveHDMIinFHD, getHaveHDMIinHD, getHaveRCA, getHaveSCART, getHaveYUV, getMachineBuild, getMachineMtdRoot
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager
 
 from Components.About import getChipSetString
@@ -6,7 +6,8 @@ from Tools.Directories import fileCheck, fileExists, fileHas, pathExists
 from Tools.HardwareInfo import HardwareInfo
 
 SystemInfo = {}
-
+SystemInfo["HasRootSubdir"] = False	# This needs to be here so it can be reset by getMultibootslots!
+SystemInfo["RecoveryMode"] = False	# This needs to be here so it can be reset by getMultibootslots!
 from Tools.Multiboot import getMBbootdevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
 
 def getNumVideoDecoders():
@@ -87,7 +88,7 @@ SystemInfo["canMultiBoot"] = False
 SystemInfo["canBackupEMC"] = False
 SystemInfo["HasHiSi"] = False
 SystemInfo["canMode12"] = False
-SystemInfo["HasMMC"] = fileHas("/proc/cmdline", "root=/dev/mmcblk")
+SystemInfo["HasMMC"] = fileHas("/proc/cmdline", "root=/dev/mmcblk") or "mmcblk" in getMachineMtdRoot()
 SystemInfo["HasH9SD"] = False
 SystemInfo["HasSDnomount"] = False
 SystemInfo["CanProc"] = False
