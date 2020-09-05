@@ -14,6 +14,7 @@ from Tools.BoundFunction import boundFunction
 from ServiceReference import ServiceReference
 from enigma import eServiceReference, eActionMap
 from Components.Label import Label
+import os
 
 ButtonSetupKeys = [	(_("Red"), "red", "Infobar/activateRedButton"),
 	(_("Red long"), "red_long", ""),
@@ -32,7 +33,9 @@ ButtonSetupKeys = [	(_("Red"), "red", "Infobar/activateRedButton"),
 	(_("Channel up"), "channelup", ""),
 	(_("Channel down"), "channeldown", ""),
 	(_("TV"), "showTv", ""),
+	(_('TV long'), 'tv_long', ""),
 	(_("Radio"), "radio", ""),
+	(_("Radio long"), "radio_long", ""),
 	(_("Rec"), "rec", ""),
 	(_("Teletext"), "text", ""),
 	(_("Help"), "displayHelp", ""),
@@ -109,7 +112,7 @@ def getButtonSetupFunctions():
 				twinPaths[plugin.path[plugin.path.rfind("Plugins"):]] = 1
 			ButtonSetupFunctions.append((plugin.name, plugin.path[plugin.path.rfind("Plugins"):] + "/" + str(twinPaths[plugin.path[plugin.path.rfind("Plugins"):]]) , "Plugins"))
 			twinPlugins.append(plugin.name)
-	ButtonSetupFunctions.append((_("Show graphical multi EPG"), "Infobar/openGraphEPG", "EPG"))
+	ButtonSetupFunctions.append((_("Show Grid EPG"), "Infobar/openGridEPG", "EPG"))
 	ButtonSetupFunctions.append((_("Main menu"), "Infobar/mainMenu", "InfoBar"))
 	ButtonSetupFunctions.append((_("Show help"), "Infobar/showHelp", "InfoBar"))
 	ButtonSetupFunctions.append((_("Show extension selection"), "Infobar/showExtensionSelection", "InfoBar"))
@@ -124,8 +127,8 @@ def getButtonSetupFunctions():
 	ButtonSetupFunctions.append((_("History next"), "Infobar/historyNext", "InfoBar"))
 	ButtonSetupFunctions.append((_("Show event info plugins"), "Infobar/showEventInfoPlugins", "EPG"))
 	ButtonSetupFunctions.append((_("Show event details"), "Infobar/openEventView", "EPG"))
-	ButtonSetupFunctions.append((_("Show EPG for current service"), "Infobar/openSingleServiceEPG", "EPG"))
-	ButtonSetupFunctions.append((_("Show multi EPG"), "Infobar/openMultiServiceEPG", "EPG"))
+	ButtonSetupFunctions.append((_("Show Single EPG"), "Infobar/openSingleServiceEPG", "EPG"))
+	ButtonSetupFunctions.append((_("Show Multi EPG"), "Infobar/openMultiServiceEPG", "EPG"))
 	ButtonSetupFunctions.append((_("Show select audio track"), "Infobar/audioSelection", "InfoBar"))
 	ButtonSetupFunctions.append((_("Show subtitle selection"), "Infobar/subtitleSelection", "InfoBar"))
 	ButtonSetupFunctions.append((_("Toggle default subtitles"), "Infobar/toggleDefaultSubtitles", "InfoBar"))
@@ -153,6 +156,10 @@ def getButtonSetupFunctions():
 	if SystemInfo["LcdLiveTV"]:
 		ButtonSetupFunctions.append((_("Toggle LCD LiveTV"), "Infobar/ToggleLCDLiveTV", "InfoBar"))
 	ButtonSetupFunctions.append((_("Do nothing"), "Void", "InfoBar"))
+	if os.path.isdir("/usr/script"):
+		for x in [x for x in os.listdir("/usr/script") if x.endswith(".sh")]:
+			x = x[:-3]
+			ButtonSetupFunctions.append((_("Script") + " " + x, "Script/" + x, "Scripts"))
 	ButtonSetupFunctions.append((_("Button setup"), "Module/Screens.ButtonSetup/ButtonSetup", "Setup"))
 	ButtonSetupFunctions.append((_("Software update"), "Module/Screens.SoftwareUpdate/UpdatePlugin", "Setup"))
 	ButtonSetupFunctions.append((_("CI (Common Interface) Setup"), "Module/Screens.Ci/CiSelection", "Setup"))
@@ -184,20 +191,9 @@ def getButtonSetupFunctions():
 	return ButtonSetupFunctions
 
 class ButtonSetup(Screen):
-	def __init__(self, session, menu_path="", args=None):
+	def __init__(self, session):
 		Screen.__init__(self, session)
-		screentitle = _("Button setup")
-		if config.usage.show_menupath.value == 'large':
-			menu_path += screentitle
-			title = menu_path
-			self["menu_path_compressed"] = StaticText("")
-		elif config.usage.show_menupath.value == 'small':
-			title = screentitle
-			self["menu_path_compressed"] = StaticText(menu_path + " >" if not menu_path.endswith(' / ') else menu_path[:-3] + " >" or "")
-		else:
-			title = screentitle
-			self["menu_path_compressed"] = StaticText("")
-		Screen.setTitle(self, title)
+		self.setTitle(_("Button Setup"))
 		self['description'] = Label(_('On your remote, click on the button you want to change'))
 		self.session = session
 		self.list = []
@@ -261,7 +257,7 @@ class ButtonSetup(Screen):
 			self["choosen"].setList(selected)
 
 class ButtonSetupSelect(Screen):
-	def __init__(self, session, key, args=None):
+	def __init__(self, session, key):
 		Screen.__init__(self, session)
 		self.skinName="ButtonSetupSelect"
 		self['description'] = Label(_('Select the desired function and click on "OK" to assign it. Use "CH+/-" to toggle between the lists. Select an assigned function and click on "OK" to de-assign it. Use "Next/Previous" to change the order of the assigned functions.'))
@@ -542,6 +538,10 @@ class InfoBarButtonSetup():
 				moviepath = defaultMoviePath()
 				if moviepath:
 					config.movielist.last_videodir.value = moviepath
+			elif selected[0] == "Script":
+				command = '/usr/script/' + selected[1] + ".sh"
+				from Screens.Console import Console
+				exec "self.session.open(Console,_(selected[1]),[command])"
 			elif selected[0] == "Menu":
 				from Screens.Menu import MainMenu, mdom
 				root = mdom.getroot()

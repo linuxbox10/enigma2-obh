@@ -14,6 +14,7 @@ from Screens.ParentalControlSetup import ProtectedScreen
 from Screens.InputBox import PinInput
 from ServiceReference import ServiceReference
 from Screens.TimerEntry import TimerEntry, TimerLog
+from Screens.Setup import Setup
 from Tools.BoundFunction import boundFunction
 from Tools.FuzzyDate import FuzzyTime
 from time import time
@@ -27,36 +28,15 @@ class TimerEditList(Screen, ProtectedScreen):
 	DELETE = 4
 	STOP = 5
 
-	def __init__(self, session, menu_path = ""):
+	def __init__(self, session, selectItem=None):
 		Screen.__init__(self, session)
-		screentitle = _("Timer List")
-		self.menu_path = menu_path
+		self.selectItem = selectItem
 		ProtectedScreen.__init__(self)
-		if config.usage.show_menupath.value == 'large':
-			self.menu_path += screentitle
-			title = self.menu_path
-			self["menu_path_compressed"] = StaticText("")
-			self.menu_path += ' / '
-		elif config.usage.show_menupath.value == 'small':
-			title = screentitle
-			condtext = ""
-			if self.menu_path and not self.menu_path.endswith(' / '):
-				condtext = self.menu_path + " >"
-			elif self.menu_path:
-				condtext = self.menu_path[:-3] + " >"
-			self["menu_path_compressed"] = StaticText(condtext)
-			self.menu_path += screentitle + ' / '
-		else:
-			title = screentitle
-			self["menu_path_compressed"] = StaticText("")
-		Screen.setTitle(self, title)
-		
-		self.onChangedEntry = [ ]
-		list = [ ]
-		self.list = list
-		self.fillTimerList()
+		self.setTitle(_("Timer List"))
 
-		self["timerlist"] = TimerList(list)
+		self.onChangedEntry = [ ]
+		self.list = []
+		self["timerlist"] = TimerList(self.list)
 
 		self.key_red_choice = self.EMPTY
 		self.key_yellow_choice = self.EMPTY
@@ -80,10 +60,35 @@ class TimerEditList(Screen, ProtectedScreen):
 				"up": self.up,
 				"down": self.down,
 				"moveTop": self.moveTop,
-				"moveEnd": self.moveEnd
+				"moveEnd": self.moveEnd,
+				"menu": self.createSetup
 			}, -1)
 		self.session.nav.RecordTimer.on_state_change.append(self.onStateChange)
-		self.onShown.append(self.updateState)
+		self.onLayoutFinish.append(self.onCreate)
+
+	def onCreate(self):
+		self.fillTimerList()
+		self["timerlist"].l.setList(self.list)
+
+		if self.selectItem is not None:
+			(event, service) = self.selectItem
+			if event is not None:
+				eventid = event.getEventId()
+				refstr = ':'.join(service.ref.toString().split(':')[:11])
+				idx = 0
+				for (timer, processed) in self.list:
+					if timer.eit == eventid and ':'.join(timer.service_ref.ref.toString().split(':')[:11]) == refstr:
+						self["timerlist"].moveToIndex(idx)
+						break
+					idx += 1
+		self.updateState()
+
+	def createSetup(self):
+		def onSetupClose(test = None):
+			self.refill()
+			pass
+
+		self.session.openWithCallback(onSetupClose, Setup, 'recording')
 
 	def isProtected(self):
 		return config.ParentalControl.setuppinactive.value and (not config.ParentalControl.config_sections.main_menu.value or hasattr(self.session, 'infobar') and self.session.infobar is None) and config.ParentalControl.config_sections.timer_menu.value and config.ParentalControl.servicepin[0].value
@@ -127,7 +132,7 @@ class TimerEditList(Screen, ProtectedScreen):
 					print "[TimerEdit] Sanity check failed"
 					simulTimerList = timersanitycheck.getSimulTimerList()
 					if simulTimerList is not None:
-						self.session.openWithCallback(self.finishedEdit, TimerSanityConflict, simulTimerList, self.menu_path)
+						self.session.openWithCallback(self.finishedEdit, TimerSanityConflict, simulTimerList)
 				else:
 					print "[TimerEdit] Sanity check passed"
 					if timersanitycheck.doubleCheck():
@@ -263,8 +268,12 @@ class TimerEditList(Screen, ProtectedScreen):
 		list = self.list
 		del list[:]
 		list.extend([(timer, False) for timer in self.session.nav.RecordTimer.timer_list])
-		if config.usage.timerlist_finished_timer_position.index != 2:
-			# only add finished timers if the "hide" option is not set
+		now = time()
+		if config.usage.timerlist_finished_timer_position.index == 2:
+			# if the "hide" option is set, continue to add disabled timers so
+			# timer conflicts remain visible
+			list.extend([(timer, True) for timer in self.session.nav.RecordTimer.processed_timers if timer.disabled and timer.end > now])
+		else:
 			list.extend([(timer, True) for timer in self.session.nav.RecordTimer.processed_timers])
 		if config.usage.timerlist_finished_timer_position.index == 1: #end of list
 			list.sort(cmp = eol_compare)
@@ -274,12 +283,12 @@ class TimerEditList(Screen, ProtectedScreen):
 	def showLog(self):
 		cur = self["timerlist"].getCurrent()
 		if cur:
-			self.session.openWithCallback(self.finishedEdit, TimerLog, cur, self.menu_path)
+			self.session.openWithCallback(self.finishedEdit, TimerLog, cur)
 
 	def openEdit(self):
 		cur = self["timerlist"].getCurrent()
 		if cur:
-			self.session.openWithCallback(self.finishedEdit, TimerEntry, cur, self.menu_path)
+			self.session.openWithCallback(self.finishedEdit, TimerEntry, cur)
 
 	def cleanupQuestion(self):
 		self.session.openWithCallback(self.cleanupTimer, MessageBox, _("Really delete completed timers?"))
@@ -343,7 +352,7 @@ class TimerEditList(Screen, ProtectedScreen):
 		self.addTimer(RecordTimerEntry(serviceref, checkOldTimers = True, dirname = preferredTimerPath(), *data))
 
 	def addTimer(self, timer):
-		self.session.openWithCallback(self.finishedAdd, TimerEntry, timer, self.menu_path)
+		self.session.openWithCallback(self.finishedAdd, TimerEntry, timer)
 
 
 	def finishedEdit(self, answer):
@@ -360,7 +369,7 @@ class TimerEditList(Screen, ProtectedScreen):
 					if not timersanitycheck.check():
 						simulTimerList = timersanitycheck.getSimulTimerList()
 						if simulTimerList is not None:
-							self.session.openWithCallback(self.finishedEdit, TimerSanityConflict, timersanitycheck.getSimulTimerList(), self.menu_path)
+							self.session.openWithCallback(self.finishedEdit, TimerSanityConflict, timersanitycheck.getSimulTimerList())
 					else:
 						success = True
 			else:
@@ -382,7 +391,7 @@ class TimerEditList(Screen, ProtectedScreen):
 						self.session.nav.RecordTimer.timeChanged(x)
 				simulTimerList = self.session.nav.RecordTimer.record(entry)
 				if simulTimerList is not None:
-					self.session.openWithCallback(self.finishSanityCorrection, TimerSanityConflict, simulTimerList, self.menu_path)
+					self.session.openWithCallback(self.finishSanityCorrection, TimerSanityConflict, simulTimerList)
 			self.fillTimerList()
 			self.updateState()
 
@@ -403,28 +412,9 @@ class TimerSanityConflict(Screen):
 	DISABLE = 2
 	EDIT = 3
 
-	def __init__(self, session, timer, menu_path=""):
+	def __init__(self, session, timer):
 		Screen.__init__(self, session)
-		screentitle = _("Timer sanity error")
-		self.menu_path = menu_path
-		if config.usage.show_menupath.value == 'large':
-			self.menu_path += screentitle
-			title = self.menu_path
-			self["menu_path_compressed"] = StaticText("")
-			self.menu_path += ' / '
-		elif config.usage.show_menupath.value == 'small':
-			title = screentitle
-			condtext = ""
-			if self.menu_path and not self.menu_path.endswith(' / '):
-				condtext = self.menu_path + " >"
-			elif self.menu_path:
-				condtext = self.menu_path[:-3] + " >"
-			self["menu_path_compressed"] = StaticText(condtext)
-			self.menu_path += screentitle + ' / '
-		else:
-			title = screentitle
-			self["menu_path_compressed"] = StaticText("")
-		Screen.setTitle(self, title)
+		self.setTitle(_("Timer Sanity Error"))
 
 		self.timer = timer
 		print "[TimerEdit] TimerSanityConflict"
@@ -467,10 +457,10 @@ class TimerSanityConflict(Screen):
 		return [(timer, False)]
 
 	def editTimer1(self):
-		self.session.openWithCallback(self.finishedEdit, TimerEntry, self["timer1"].getCurrent(), self.menu_path)
+		self.session.openWithCallback(self.finishedEdit, TimerEntry, self["timer1"].getCurrent())
 
 	def editTimer2(self):
-		self.session.openWithCallback(self.finishedEdit, TimerEntry, self["timer2"].getCurrent(), self.menu_path)
+		self.session.openWithCallback(self.finishedEdit, TimerEntry, self["timer2"].getCurrent())
 
 	def toggleTimer(self):
 		x = self["list"].getSelectedIndex() + 1 # the first is the new timer so we do +1 here

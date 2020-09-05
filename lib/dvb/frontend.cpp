@@ -5,6 +5,7 @@
 #include <lib/dvb/frontendparms.h>
 #include <lib/base/cfile.h>
 #include <lib/base/eerror.h>
+#include <lib/base/estring.h>
 #include <lib/base/nconfig.h> // access to python config
 #include <errno.h>
 #include <unistd.h>
@@ -759,6 +760,15 @@ int eDVBFrontend::closeFrontend(bool force, bool no_delayed)
 	if (m_fd >= 0)
 	{
 		eDebugNoSimulate("[eDVBFrontend%d] close frontend", m_dvbid);
+
+		long link = m_data[ADVANCED_SATPOSDEPENDS_LINK];
+		if (link != -1)
+		{
+			m_data[ADVANCED_SATPOSDEPENDS_LINK] = -1;
+			if (m_sec && !m_simulate)
+				m_sec->resetAdvancedsatposdependsRoot(link);
+		}
+
 		if (m_data[SATCR] != -1)
 		{
 			if (!no_delayed)
@@ -1097,7 +1107,13 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 	{
 		ret = (snr * 240) >> 8;
 	}
-	else if (strstr(m_description, "BCM4506") || strstr(m_description, "BCM4505") || strstr(m_description, "BCM45208") || strstr(m_description, "BCM45308") || strstr(m_description, "BCM4506 (internal)") || strstr(m_description, "BCM73625 (G3)"))
+	else if (strstr(m_description, "BCM4506") ||
+		strstr(m_description, "BCM4505") ||
+		strstr(m_description, "BCM45208") ||
+		strstr(m_description, "BCM45308") ||
+		strstr(m_description, "BCM4506 (internal)") ||
+		strstr(m_description, "BCM73625 (G3)") ||
+		strstr(m_description, "BCM3158"))
 	{
 		ret = (snr * 100) >> 8;
 	}
@@ -1114,7 +1130,9 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 	{
 		ret = (int)((((double(snr) / (65535.0 / 100.0)) * 0.1600) + 0.2100) * 100);
 	}
-	else if (!strcmp(m_description, "Vuplus DVB-S NIM(AVL6222)") || !strcmp(m_description, "Vuplus DVB-S NIM(AVL6211)") || !strcmp(m_description, "BCM7335 DVB-S2 NIM (internal)")) // VU+ DVB-S2 Dual NIM and VU+DUO DVB-S2 NIM
+	else if (!strcmp(m_description, "Vuplus DVB-S NIM(AVL6222)") ||
+		!strcmp(m_description, "Vuplus DVB-S NIM(AVL6211)") ||
+		!strcmp(m_description, "BCM7335 DVB-S2 NIM (internal)")) // VU+ DVB-S2 Dual NIM and VU+DUO DVB-S2 NIM
 	{
 		ret = (int)((((double(snr) / (65535.0 / 100.0)) * 0.1244) + 2.5079) * 100);
 		if (!strcmp(m_description, "Vuplus DVB-S NIM(AVL6222)"))
@@ -1142,10 +1160,9 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 	{
 		ret = (int)((((double(snr) / (65535.0 / 100.0)) * 0.28) - 10.0) * 100);
 	}
-	else if (!strcmp(m_description, "DVB-S2 NIM(45208 FBC)")
-		|| !strcmp(m_description, "DVB-S2 NIM(45308 FBC)")
-		|| !strcmp(m_description, "DVB-S2X NIM(45308X FBC)")
-		)
+	else if (strstr(m_description, "NIM(45208 FBC)") ||
+		strstr(m_description, "NIM(45308 FBC)") ||
+		strstr(m_description, "NIM(45308X FBC)"))
 	{
 		ret = (int)((((double(snr) / (65535.0 / 100.0)) * 0.1950) - 1.0000) * 100);
 	}
@@ -1235,6 +1252,11 @@ void eDVBFrontend::calculateSignalQuality(int snr, int &signalquality, int &sign
 	{
 		ret = (int)(snr / 40.5);
 		sat_max = 1900;
+	}
+	else if (strstr(m_description, "BCM3148"))
+	{
+		ret = (int)(snr / 15.61);
+		sat_max = 4200;
 	}
 	else if(!strcmp(m_description, "TBS-5925") || !strcmp(m_description, "DVBS2BOX") || !strcmp(m_description, "TechniSat USB device"))
 	{
@@ -2456,7 +2478,8 @@ RESULT eDVBFrontend::prepare_sat(const eDVBFrontendParametersSatellite &feparm, 
 			feparm.pls_code,
 			feparm.t2mi_plp_id,
 			feparm.t2mi_pid);
-		if ((unsigned int)satfrequency < fe_info.frequency_min || (unsigned int)satfrequency > fe_info.frequency_max)
+		if ((unsigned int)satfrequency < (fe_info.type ? fe_info.frequency_min/1000 : fe_info.frequency_min)
+			|| (unsigned int)satfrequency > (fe_info.type ? fe_info.frequency_max/1000 : fe_info.frequency_max))
 		{
 			eDebugNoSimulate("[eDVBFrontend%d] %d mhz out of tuner range.. dont tune", m_dvbid, satfrequency / 1000);
 			return -EINVAL;
@@ -2688,6 +2711,7 @@ RESULT eDVBFrontend::setVoltage(int voltage)
 	}
 	if (m_simulate)
 		return 0;
+	eDebug("[eDVBFrontend%d] setVoltage FE_ENABLE_HIGH_LNB_VOLTAGE %d FE_SET_VOLTAGE %d", m_dvbid, increased, vlt);
 	::ioctl(m_fd, FE_ENABLE_HIGH_LNB_VOLTAGE, increased);
 	return ::ioctl(m_fd, FE_SET_VOLTAGE, vlt);
 }
@@ -2795,7 +2819,7 @@ RESULT eDVBFrontend::setData(int num, long val)
 	return -EINVAL;
 }
 
-int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm)
+int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm, bool is_configured_sat)
 {
 	int type;
 	int score = 0;
@@ -2831,7 +2855,13 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm)
 			// eDebug("[eDVBFrontend] isCompatibleWith NON MULTISTREAM TUNER!!!!!");
 			return 0;
 		}
+
 		score = m_sec ? m_sec->canTune(parm, this, 1 << m_slotid) : 0;
+
+		/* additional check is orbital position configured for busy tuner use type SATPOS_DEPENDS_PTR/ADVANCED_SATPOSDEPENDS_ROOT(LINK) */
+		if (is_configured_sat && !score && m_sec && m_sec->isOrbitalPositionConfigured(parm.orbital_position))
+			score = 1;
+
 		if (score > 1 && parm.system == eDVBFrontendParametersSatellite::System_DVB_S && can_handle_dvbs2)
 		{
 			/* prefer to use an S tuner, try to keep S2 free for S2 transponders */
@@ -3081,16 +3111,18 @@ std::string eDVBFrontend::getCapabilities()
 	ss << "DVB API version: " << m_dvbversion / 256 << "." << m_dvbversion % 256 << std::endl;
 	ss << "Frontend: " << fe_info.name << std::endl;
 
+	int k = fe_info.type ? 1 : 1000;
+
 	ss << "Frequency:";
-	ss << " min " << fe_info.frequency_min;
-	ss << " max " << fe_info.frequency_max;
-	ss << " stepsize " << fe_info.frequency_stepsize;
-	ss << " tolerance " << fe_info.frequency_tolerance << std::endl;
+	ss << " min " <<  formatHz(fe_info.frequency_min * k);
+	ss << " max " << formatHz(fe_info.frequency_max * k);
+	ss << " stepsize " << formatHz(fe_info.frequency_stepsize * k);
+	ss << " tolerance " << formatHz(fe_info.frequency_tolerance * k) << std::endl;
 
 	ss << "Symbolrate:";
-	ss << " min " << fe_info.symbol_rate_min;
-	ss << " max " << fe_info.symbol_rate_max;
-	ss << " tolerance " << fe_info.symbol_rate_tolerance << std::endl;
+	ss << " min " << formatNumber(fe_info.symbol_rate_min, "Bauds");
+	ss << " max " << formatNumber(fe_info.symbol_rate_max, "Bauds");
+	ss << " tolerance " << formatHz(fe_info.symbol_rate_tolerance) << std::endl;
 
 	ss << "Capabilities:";
 	if (fe_info.caps == FE_IS_STUPID)			ss << " stupid FE";
