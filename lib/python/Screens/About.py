@@ -46,7 +46,7 @@ class About(Screen):
 									})
 
 	def populate(self):
-		self["lab1"] = StaticText(_("Open Donki 4.3"))
+		self["lab1"] = StaticText(_("Open Donki 4.4"))
 		self["lab2"] = StaticText(_("OpenBH custom build"))
 		model = None
 		AboutText = ""
@@ -323,7 +323,7 @@ class SystemMemoryInfo(Screen):
 		Screen.__init__(self, session)
 		self.setTitle(_("Memory"))
 		self.skinName = ["SystemMemoryInfo", "About"]
-		self["lab1"] = StaticText(_("Open Donki 4.3"))
+		self["lab1"] = StaticText(_("Open Donki 4.4"))
 		self["lab2"] = StaticText(_("OpenBH custom build")) 
 		self["lab3"] = StaticText(_("Support at %s") % "vuplus-images.co.uk")
 		self["AboutScrollLabel"] = ScrollLabel()
